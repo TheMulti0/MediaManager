@@ -39,28 +39,28 @@ namespace MediaManager.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-            
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options => options.LoginPath = "/auth/unauthorized")
+                .AddCookie(
+                    options => options.LoginPath = "/auth/unauthorized")
                 .AddFacebook(
-                    facebookOptions =>
+                    options =>
                     {
-                        facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                        facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                        options.AppId = Configuration["Authentication:Facebook:AppId"];
+                        options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
 
-                        facebookOptions.SaveTokens = true;
-                        facebookOptions.Events.OnCreatingTicket += context =>
-                        {
-                            var claim = new Claim("Facebook tokens", "");
-                            foreach (KeyValuePair<string, string> token in context.Properties.Items)
-                            {
-                                claim.Properties.Add(token);
-                            }
-                            context.Identity.AddClaim(claim);
-
-                            return Task.CompletedTask;
-                        };
-                    });
+                        options.SaveTokens = true;
+                        options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
+                    })
+            .AddTwitter(
+                options =>
+                {
+                    options.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
+                    options.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
+            
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

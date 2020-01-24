@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +9,8 @@ namespace MediaManager.Web.Controllers
     [Route("[controller]")]
     public class AuthController : Controller
     {
+        private const string DefaultRedirect = "/";
+
         [HttpGet("unauthorized")]
         public IActionResult NeedLogin()
         {
@@ -14,14 +18,21 @@ namespace MediaManager.Web.Controllers
         }
 
         [HttpGet("login")]
-        public IActionResult Login(string redirectUri = "/")
+        public IActionResult Login(string provider)
         {
             return Challenge(
                 new AuthenticationProperties
                 {
-                    RedirectUri = redirectUri
-                },
-                FacebookDefaults.AuthenticationScheme);
+                    RedirectUri = DefaultRedirect
+                }, provider);
+        }
+
+        [HttpGet("logout")]
+        public async Task<IActionResult> Logout(string provider)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return Redirect(DefaultRedirect);
         }
     }
 }
