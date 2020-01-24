@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using FacebookManager.Web.Models;
+using MediaManager.Web.Models;
 
-namespace FacebookManager.Web.Controllers
+namespace MediaManager.Web.Controllers
 {
     public class HomeController : Controller
     {

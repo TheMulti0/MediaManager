@@ -1,6 +1,6 @@
 using System;
 
-namespace FacebookManager.Web.Models
+namespace MediaManager.Web.Models
 {
     public class ErrorViewModel
     {

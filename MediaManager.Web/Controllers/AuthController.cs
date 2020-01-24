@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FacebookManager.Web.Controllers
+namespace MediaManager.Web.Controllers
 {
     [Route("[controller]")]
     public class AuthController : Controller
