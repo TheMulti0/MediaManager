@@ -2,33 +2,29 @@ using System;
 
 namespace MediaManager
 {
-    public class Post : IEquatable<Post>
+    public class User : IEquatable<User>
     {
         public long Id { get; }
 
-        public string Message { get; }
+        public string Name { get; }
 
-        public User Author { get; }
-
-        public DateTime CreatedAt { get; }
+        public string DisplayName { get; }
 
         public string Url { get; }
 
-        public Post(
+        public User(
             long id,
-            string message,
-            User author,
-            DateTime createdAt,
+            string name,
+            string displayName,
             string url)
         {
             Id = id;
-            Message = message;
-            Author = author;
-            CreatedAt = createdAt;
+            Name = name;
+            DisplayName = displayName;
             Url = url;
         }
 
-        public bool Equals(Post? other)
+        public bool Equals(User? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -55,13 +51,13 @@ namespace MediaManager
             {
                 return false;
             }
-            return Equals((Post) obj);
+            return Equals((User) obj);
         }
 
         public override int GetHashCode() => Id.GetHashCode();
 
-        public static bool operator ==(Post? left, Post? right) => Equals(left, right);
+        public static bool operator ==(User? left, User? right) => Equals(left, right);
 
-        public static bool operator !=(Post? left, Post? right) => !Equals(left, right);
+        public static bool operator !=(User? left, User? right) => !Equals(left, right);
     }
 }

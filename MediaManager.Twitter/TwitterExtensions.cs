@@ -1,13 +1,22 @@
 using Tweetinvi.Models;
 
-namespace MediaManager.Twitter
+namespace MediaManager
 {
     public static class TwitterExtensions
     {
-        public static MediaUser ToMediaUser(this IUser user) =>
-            new MediaUser(
+        public static User ToMediaUser(this IUser user) =>
+            new User(
                 user.Id,
                 user.ScreenName,
-                user.Name);
+                user.Name,
+                user.Url);
+
+        public static Post ToPost(this ITweet tweet) =>
+            new Post(
+                tweet.Id,
+                tweet.Text,
+                tweet.CreatedBy.ToMediaUser(),
+                tweet.CreatedAt,
+                tweet.Url);
     }
 }
