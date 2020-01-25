@@ -7,6 +7,8 @@ namespace MediaManager
     {
         Task<User> GetIdentityAsync();
 
+        Task<Post> FindPostAsync(long postId);
+
         IAsyncEnumerable<Post> FindPostsAsync(string query);
 
         IAsyncEnumerable<Post> FindPostsAsync(User author);

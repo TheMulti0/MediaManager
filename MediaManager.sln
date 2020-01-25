@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Twitter", "Med
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Runner", "MediaManager.Runner\MediaManager.Runner.csproj", "{1935F233-C5A9-476E-8302-C2520554EF5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Twitter.Tests", "MediaManager.Twitter.Tests\MediaManager.Twitter.Tests.csproj", "{3D7DF052-C936-4C33-903F-510B8D348EA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1935F233-C5A9-476E-8302-C2520554EF5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1935F233-C5A9-476E-8302-C2520554EF5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1935F233-C5A9-476E-8302-C2520554EF5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

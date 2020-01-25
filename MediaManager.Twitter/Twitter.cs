@@ -29,6 +29,12 @@ namespace MediaManager
             return user.ToMediaUser();
         }
 
+        public async Task<Post> FindPostAsync(long postId)
+        {
+            ITweet tweet = await TweetAsync.GetTweet(postId);
+            return tweet.ToPost();
+        }
+
         public IAsyncEnumerable<Post> FindPostsAsync(string query)
         {
             Task<IEnumerable<ITweet>> searchTweets = SearchAsync.SearchTweets(query);
