@@ -1,0 +1,27 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaManager.Extensions
+{
+    public static class AsyncEnumerableExtensions
+    {
+        public static async Task<IAsyncEnumerable<T>> FlattenAsync<T>(this Task<IEnumerable<T>> task)
+        {
+            IEnumerable<T> enumerable = await task;
+            
+            return AsyncEnumerable.Create(
+                token =>
+                {
+                    IEnumerator<T> enumerator = enumerable.GetEnumerator();
+
+                    return AsyncEnumerator
+                        .Create(
+                            async () => enumerator.MoveNext(),
+                            () => enumerator.Current,
+                            async () => enumerator.Dispose())
+                        .WithCancellation(token);
+                });
+        }
+    }
+}
