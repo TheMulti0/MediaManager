@@ -52,15 +52,15 @@ namespace MediaManager.Web
                         options.SaveTokens = true;
                         options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
                     })
-            .AddTwitter(
-                options =>
-                {
-                    options.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
-                    options.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
-            
-                    options.SaveTokens = true;
-                    options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
-                });
+                .AddTwitter(
+                    options =>
+                    {
+                        options.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
+                        options.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
+                
+                        options.SaveTokens = true;
+                        options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
