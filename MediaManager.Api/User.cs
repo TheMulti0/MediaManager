@@ -1,6 +1,6 @@
 using System;
 
-namespace MediaManager
+namespace MediaManager.Api
 {
     public class User : IEquatable<User>
     {

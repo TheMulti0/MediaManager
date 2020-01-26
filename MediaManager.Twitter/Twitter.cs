@@ -2,49 +2,66 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediaManager.Api;
 using MediaManager.Extensions;
 using Tweetinvi;
 using Tweetinvi.Models;
+using User = MediaManager.Api.User;
 
-namespace MediaManager
+namespace MediaManager.Twitter
 {
-    public class Twitter : ISocialMedia
+    public class Twitter : ISocialMediaProvider
     {
+        private readonly TwitterExecuter _executer;
+
         public Twitter(
             string consumerKey,
             string consumerSecret,
             string userAccessToken,
             string userAccessSecret)
         {
-            Auth.SetUserCredentials(
+            ITwitterCredentials credentials = Auth.CreateCredentials(
                 consumerKey,
                 consumerSecret,
                 userAccessToken,
                 userAccessSecret);
+            
+            _executer = new TwitterExecuter(credentials);
         }
 
         public async Task<User> GetIdentityAsync()
         {
-            IAuthenticatedUser user = await UserAsync.GetAuthenticatedUser();
+            IAuthenticatedUser user = await _executer
+                .Execute(UserAsync.GetAuthenticatedUser);
+            
             return user.ToMediaUser();
         }
 
         public async Task<Post> FindPostAsync(long postId)
         {
-            ITweet tweet = await TweetAsync.GetTweet(postId);
+            ITweet tweet = await _executer
+                .Execute(() => TweetAsync.GetTweet(postId));
+            
             return tweet.ToPost();
         }
 
         public IAsyncEnumerable<Post> FindPostsAsync(string query)
         {
-            Task<IEnumerable<ITweet>> searchTweets = SearchAsync.SearchTweets(query);
+            Task<IEnumerable<ITweet>> searchTweets = _executer
+                .Execute(() => SearchAsync.SearchTweets(query));
+            
             return ToPostsAsync(searchTweets);
         }
 
         public async IAsyncEnumerable<Post> FindPostsAsync(User author)
         {
-            IUser user = await UserAsync.GetUserFromId(author.Id);
-            IAsyncEnumerable<Post> posts = ToPostsAsync(user.GetUserTimelineAsync());
+            IUser user = await _executer
+                .Execute(() => UserAsync.GetUserFromId(author.Id));
+
+            var userTimelineTask = _executer
+                .Execute(() => user.GetUserTimelineAsync());
+            
+            IAsyncEnumerable<Post> posts = ToPostsAsync(userTimelineTask);
 
             await foreach (Post post in posts)
             {
@@ -60,13 +77,17 @@ namespace MediaManager
 
         public async Task<Post> PostAsync(string content)
         {
-            ITweet tweet = await TweetAsync.PublishTweet(content);
+            ITweet tweet = await _executer
+                .Execute(() => TweetAsync.PublishTweet(content));
+            
             return tweet.ToPost();
         }
 
         public async Task DeleteAsync(Post post)
         {
-            bool success = await TweetAsync.DestroyTweet(post.Id);
+            bool success = await _executer
+                .Execute(() => TweetAsync.DestroyTweet(post.Id));
+            
             if (!success)
             {
                 throw new OperationCanceledException();
@@ -75,7 +96,9 @@ namespace MediaManager
 
         public async Task LikeAsync(Post post)
         {
-            ITweet tweet = await TweetAsync.GetTweet(post.Id);
+            ITweet tweet = await _executer
+                .Execute(() => TweetAsync.GetTweet(post.Id));
+            
             if (!tweet.Favorited)
             {
                 await tweet.FavoriteAsync();
@@ -84,10 +107,13 @@ namespace MediaManager
 
         public async Task UnlikeAsync(Post post)
         {
-            ITweet tweet = await TweetAsync.GetTweet(post.Id);
+            ITweet tweet = await _executer
+                .Execute(() => TweetAsync.GetTweet(post.Id));
+            
             if (tweet.Favorited)
             {
-                await tweet.UnFavoriteAsync();
+                await _executer
+                    .Execute(() => tweet.UnFavoriteAsync());
             }
         }
 

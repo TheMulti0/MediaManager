@@ -5,13 +5,11 @@ VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Web", "MediaManager.Web\MediaManager.Web.csproj", "{CE4178D4-C100-445A-A944-2C07EDC66050}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager", "MediaManager\MediaManager.csproj", "{AD9E027C-82FF-4287-8DB6-1544D5ADC38A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Api", "MediaManager.Api\MediaManager.Api.csproj", "{AD9E027C-82FF-4287-8DB6-1544D5ADC38A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Extensions", "MediaManager.Extensions\MediaManager.Extensions.csproj", "{9B01D064-E48F-437C-A2CF-59608DD5717A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Twitter", "MediaManager.Twitter\MediaManager.Twitter.csproj", "{AE0BA2B1-683E-4C93-83A7-46CBBF982496}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Runner", "MediaManager.Runner\MediaManager.Runner.csproj", "{1935F233-C5A9-476E-8302-C2520554EF5C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Twitter.Tests", "MediaManager.Twitter.Tests\MediaManager.Twitter.Tests.csproj", "{3D7DF052-C936-4C33-903F-510B8D348EA6}"
 EndProject
@@ -37,10 +35,6 @@ Global
 		{AE0BA2B1-683E-4C93-83A7-46CBBF982496}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE0BA2B1-683E-4C93-83A7-46CBBF982496}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE0BA2B1-683E-4C93-83A7-46CBBF982496}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1935F233-C5A9-476E-8302-C2520554EF5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1935F233-C5A9-476E-8302-C2520554EF5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1935F233-C5A9-476E-8302-C2520554EF5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1935F233-C5A9-476E-8302-C2520554EF5C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D7DF052-C936-4C33-903F-510B8D348EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU

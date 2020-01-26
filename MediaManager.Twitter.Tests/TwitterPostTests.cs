@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediaManager.Api;
 using Xunit;
 
-namespace MediaManager.Tests
+namespace MediaManager.Twitter.Tests
 {
     public class TwitterPostTests : TwitterTestBase
     {

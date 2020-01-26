@@ -1,4 +1,4 @@
-namespace MediaManager.Tests
+namespace MediaManager.Twitter.Tests
 {
     public class Configuration
     {

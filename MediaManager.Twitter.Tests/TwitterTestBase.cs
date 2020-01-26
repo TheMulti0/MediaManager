@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace MediaManager.Tests
+namespace MediaManager.Twitter.Tests
 {
     public class TwitterTestBase
     {

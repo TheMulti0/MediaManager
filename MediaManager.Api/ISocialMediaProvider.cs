@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MediaManager
+namespace MediaManager.Api
 {
-    public interface ISocialMedia
+    public interface ISocialMediaProvider
     {
         Task<User> GetIdentityAsync();
 

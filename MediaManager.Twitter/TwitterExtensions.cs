@@ -1,6 +1,8 @@
+using MediaManager.Api;
 using Tweetinvi.Models;
+using User = MediaManager.Api.User;
 
-namespace MediaManager
+namespace MediaManager.Twitter
 {
     public static class TwitterExtensions
     {
