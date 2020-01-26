@@ -6,7 +6,7 @@ namespace MediaManager.Twitter
 {
     public static class TwitterExtensions
     {
-        public static User ToMediaUser(this IUser user) =>
+        public static User ToUser(this IUser user) =>
             new User(
                 user.Id,
                 user.ScreenName,
@@ -17,7 +17,7 @@ namespace MediaManager.Twitter
             new Post(
                 tweet.Id,
                 tweet.Text,
-                tweet.CreatedBy.ToMediaUser(),
+                tweet.CreatedBy.ToUser(),
                 tweet.CreatedAt,
                 tweet.Url);
     }

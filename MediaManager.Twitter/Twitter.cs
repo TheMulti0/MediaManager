@@ -29,12 +29,19 @@ namespace MediaManager.Twitter
             _executer = new TwitterExecuter(credentials);
         }
 
-        public async Task<User> GetIdentityAsync()
+        public Task<User> GetIdentityAsync()
+            => GetUserFromTwitter(async () => (IUser) await UserAsync.GetAuthenticatedUser());
+
+        public Task<User> GetUserAsync(long userId)
+            => GetUserFromTwitter(() => UserAsync.GetUserFromId(userId));
+
+        public Task<User> GetUserAsync(string name)
+            => GetUserFromTwitter(() => UserAsync.GetUserFromScreenName(name));
+
+        private async Task<User> GetUserFromTwitter(Func<Task<IUser>> supplier)
         {
-            IAuthenticatedUser user = await _executer
-                .Execute(UserAsync.GetAuthenticatedUser);
-            
-            return user.ToMediaUser();
+            IUser user = await _executer.Execute(supplier);
+            return user.ToUser();
         }
 
         public async Task<Post> FindPostAsync(long postId)

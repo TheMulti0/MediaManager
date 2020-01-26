@@ -7,6 +7,10 @@ namespace MediaManager.Api
     {
         Task<User> GetIdentityAsync();
 
+        Task<User> GetUserAsync(long userId);
+
+        Task<User> GetUserAsync(string name);
+
         Task<Post> FindPostAsync(long postId);
 
         IAsyncEnumerable<Post> FindPostsAsync(string query);

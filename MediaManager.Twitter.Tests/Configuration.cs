@@ -12,10 +12,14 @@ namespace MediaManager.Twitter.Tests
         
         public TwitterConfiguration? Twitter { get; set; }
 
-        public long Id { get; set; }
+        public long DefaultPostId { get; set; }
         
-        public string Query { get; set; }
+        public string DefaultPostQuery { get; set; }
         
-        public string Description { get; set; }
+        public string DefaultPostDescription { get; set; }
+
+        public long DefaultUserId { get; set; }
+
+        public string DefaultUserName { get; set; }
     }
 }

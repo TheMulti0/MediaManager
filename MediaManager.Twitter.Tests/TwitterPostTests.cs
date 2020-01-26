@@ -12,14 +12,14 @@ namespace MediaManager.Twitter.Tests
         [Fact]
         public async void TestFindPostById()
         {
-            Post post = await Twitter.FindPostAsync(Config.Id);
-            Assert.Equal(Config.Id, post.Id);
+            Post post = await Twitter.FindPostAsync(Config.DefaultPostId);
+            Assert.Equal(Config.DefaultPostId, post.Id);
         }
         
         [Fact]
         public async void TestFindPostsByQuery()
         {
-            IAsyncEnumerable<Post> posts = Twitter.FindPostsAsync(Config.Query);
+            IAsyncEnumerable<Post> posts = Twitter.FindPostsAsync(Config.DefaultPostQuery);
             Assert.False(await posts.IsEmptyAsync());
         }
 
@@ -38,7 +38,7 @@ namespace MediaManager.Twitter.Tests
         [Fact]
         public async void TestPostAndDelete()
         {
-            Post post = await Twitter.PostAsync(Config.Description);
+            Post post = await Twitter.PostAsync(Config.DefaultPostDescription);
             
             async Task Delete() => await Twitter.DeleteAsync(post);
 
