@@ -5,26 +5,26 @@ namespace MediaManager.Api
 {
     public interface ISocialMediaProvider
     {
-        Task<User> GetIdentityAsync();
+        Task<IUser> GetIdentityAsync();
 
-        Task<User> GetUserAsync(long userId);
+        Task<IUser> GetUserAsync(long userId);
 
-        Task<User> GetUserAsync(string name);
+        Task<IUser> GetUserAsync(string name);
 
-        Task<Post> FindPostAsync(long postId);
+        Task<IPost> FindPostAsync(long postId);
 
-        IAsyncEnumerable<Post> FindPostsAsync(string query);
+        IAsyncEnumerable<IPost> FindPostsAsync(string query);
 
-        IAsyncEnumerable<Post> FindPostsAsync(User author);
+        IAsyncEnumerable<IPost> FindPostsAsync(IUser author);
         
-        IAsyncEnumerable<Post> FindPostsAsync(User author, string query);
+        IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query);
 
-        Task<Post> PostAsync(string content);
+        Task<IPost> PostAsync(string description);
 
-        Task DeleteAsync(Post post);
+        Task DeleteAsync(IPost post);
 
-        Task LikeAsync(Post post);
+        Task LikeAsync(IPost post);
 
-        Task UnlikeAsync(Post post);
+        Task UnlikeAsync(IPost post);
     }
 } 

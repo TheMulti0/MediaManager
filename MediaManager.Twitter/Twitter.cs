@@ -6,7 +6,8 @@ using MediaManager.Api;
 using MediaManager.Extensions;
 using Tweetinvi;
 using Tweetinvi.Models;
-using User = MediaManager.Api.User;
+using Tweetinvi.Parameters;
+using IUser = MediaManager.Api.IUser;
 
 namespace MediaManager.Twitter
 {
@@ -29,30 +30,27 @@ namespace MediaManager.Twitter
             _executer = new TwitterExecuter(credentials);
         }
 
-        public Task<User> GetIdentityAsync()
-            => GetUserFromTwitter(async () => (IUser) await UserAsync.GetAuthenticatedUser());
+        public Task<IUser> GetIdentityAsync()
+            => GetUserFromTwitter(async () => (Tweetinvi.Models.IUser) await UserAsync.GetAuthenticatedUser());
 
-        public Task<User> GetUserAsync(long userId)
+        public Task<IUser> GetUserAsync(long userId)
             => GetUserFromTwitter(() => UserAsync.GetUserFromId(userId));
 
-        public Task<User> GetUserAsync(string name)
+        public Task<IUser> GetUserAsync(string name)
             => GetUserFromTwitter(() => UserAsync.GetUserFromScreenName(name));
 
-        private async Task<User> GetUserFromTwitter(Func<Task<IUser>> supplier)
+        private async Task<IUser> GetUserFromTwitter(Func<Task<Tweetinvi.Models.IUser>> supplier)
         {
-            IUser user = await _executer.Execute(supplier);
-            return user.ToUser();
+            return new TwitterUser(await _executer.Execute(supplier));
         }
 
-        public async Task<Post> FindPostAsync(long postId)
+        public async Task<IPost> FindPostAsync(long postId)
         {
-            ITweet tweet = await _executer
-                .Execute(() => TweetAsync.GetTweet(postId));
-            
-            return tweet.ToPost();
+            return new TwitterPost(await _executer
+                .Execute(() => TweetAsync.GetTweet(postId)));
         }
 
-        public IAsyncEnumerable<Post> FindPostsAsync(string query)
+        public IAsyncEnumerable<IPost> FindPostsAsync(string query)
         {
             Task<IEnumerable<ITweet>> searchTweets = _executer
                 .Execute(() => SearchAsync.SearchTweets(query));
@@ -60,37 +58,35 @@ namespace MediaManager.Twitter
             return ToPostsAsync(searchTweets);
         }
 
-        public async IAsyncEnumerable<Post> FindPostsAsync(User author)
+        public async IAsyncEnumerable<IPost> FindPostsAsync(IUser author)
         {
-            IUser user = await _executer
+            Tweetinvi.Models.IUser user = await _executer
                 .Execute(() => UserAsync.GetUserFromId(author.Id));
 
             var userTimelineTask = _executer
                 .Execute(() => user.GetUserTimelineAsync());
             
-            IAsyncEnumerable<Post> posts = ToPostsAsync(userTimelineTask);
+            IAsyncEnumerable<IPost> posts = ToPostsAsync(userTimelineTask);
 
-            await foreach (Post post in posts)
+            await foreach (IPost post in posts)
             {
                 yield return post;
             }
         }
 
-        public IAsyncEnumerable<Post> FindPostsAsync(User author, string query)
+        public IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query)
         {
             return FindPostsAsync(query)
                 .Where(post => post.Author == author);
         }
 
-        public async Task<Post> PostAsync(string content)
+        public async Task<IPost> PostAsync(string description)
         {
-            ITweet tweet = await _executer
-                .Execute(() => TweetAsync.PublishTweet(content));
-            
-            return tweet.ToPost();
+            return new TwitterPost(await _executer
+                .Execute(() => TweetAsync.PublishTweet(description)));
         }
 
-        public async Task DeleteAsync(Post post)
+        public async Task DeleteAsync(IPost post)
         {
             bool success = await _executer
                 .Execute(() => TweetAsync.DestroyTweet(post.Id));
@@ -101,7 +97,7 @@ namespace MediaManager.Twitter
             }
         }
 
-        public async Task LikeAsync(Post post)
+        public async Task LikeAsync(IPost post)
         {
             ITweet tweet = await _executer
                 .Execute(() => TweetAsync.GetTweet(post.Id));
@@ -112,7 +108,7 @@ namespace MediaManager.Twitter
             }
         }
 
-        public async Task UnlikeAsync(Post post)
+        public async Task UnlikeAsync(IPost post)
         {
             ITweet tweet = await _executer
                 .Execute(() => TweetAsync.GetTweet(post.Id));
@@ -124,13 +120,13 @@ namespace MediaManager.Twitter
             }
         }
 
-        private static async IAsyncEnumerable<Post> ToPostsAsync(Task<IEnumerable<ITweet>> tweets)
+        private static async IAsyncEnumerable<IPost> ToPostsAsync(Task<IEnumerable<ITweet>> tweets)
         {
             IAsyncEnumerable<ITweet> result = await tweets.FlattenAsync();
 
             await foreach (ITweet tweet in result)
             {
-                yield return tweet.ToPost();
+                yield return new TwitterPost(tweet);
             }
         }
     }

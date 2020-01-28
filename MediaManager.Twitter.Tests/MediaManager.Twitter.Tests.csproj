@@ -22,6 +22,7 @@
     <ItemGroup>
       <ProjectReference Include="..\MediaManager.Api\MediaManager.Api.csproj" />
       <ProjectReference Include="..\MediaManager.Twitter\MediaManager.Twitter.csproj" />
+      <ProjectReference Include="..\MediaManager\MediaManager.csproj" />
     </ItemGroup>
 
 </Project>

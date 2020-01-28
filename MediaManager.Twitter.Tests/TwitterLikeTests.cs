@@ -19,6 +19,6 @@ namespace MediaManager.Twitter.Tests
             await Twitter.UnlikeAsync(await GetPost());
         }
         
-        private async Task<Post> GetPost() => await Twitter.FindPostAsync(Config.DefaultPostId);
+        private async Task<IPost> GetPost() => await Twitter.FindPostAsync(Config.DefaultPostId);
     }
 }
