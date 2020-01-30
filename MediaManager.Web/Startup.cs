@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using MediaManager.Web.Data;
+using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,12 +23,12 @@ namespace MediaManager.Web
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -34,24 +36,22 @@ namespace MediaManager.Web
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase("ApplicationDb"));
-            
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole<long>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(
-                    options => options.LoginPath = "/auth/unauthorized")
-                .AddFacebook(
-                    options =>
-                    {
-                        options.AppId = Configuration["Authentication:Facebook:AppId"];
-                        options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-
-                        options.SaveTokens = true;
-                        options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
-                    })
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/auth/unauthorized";
+                options.LogoutPath = "/auth/logout";
+            });
+            
+            services.AddSingleton<TwitterAppConfiguration>();
+            
+            services.AddAuthentication(IdentityConstants.ApplicationScheme)
                 .AddTwitter(
                     options =>
                     {
@@ -59,7 +59,6 @@ namespace MediaManager.Web
                         options.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
                 
                         options.SaveTokens = true;
-                        options.Events.OnCreatingTicket += AuthenticationExtensions.CreateTicketAsync;
                     });
         }
 

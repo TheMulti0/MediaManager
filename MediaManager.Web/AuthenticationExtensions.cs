@@ -1,27 +1,71 @@
 using System.Collections.Generic;
-using System.Security.Claims;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace MediaManager.Web
 {
     public static class AuthenticationExtensions
     {
-        public static async Task CreateTicketAsync<T>(ResultContext<T> context) 
-            where T : AuthenticationSchemeOptions
+        public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync<TUser>(
+            this SignInManager<TUser> manager, 
+            string provider,
+            string displayName) where TUser : class
         {
-            var claim = new Claim("Tokens", "");
-            foreach (KeyValuePair<string, string> token in context.Properties.Items)
+            AuthenticateResult auth = await manager.Context.AuthenticateAsync(provider);
+            IDictionary<string, string> items = auth?.Properties?.Items;
+            if (auth?.Principal == null || items == null)
             {
-                claim.Properties.Add(token);
+                return null;
             }
-            var identity = context.Principal?.Identity as ClaimsIdentity;
-            identity?.AddClaim(claim);
 
-            await context.HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                context.Principal);
+            return new ExternalLoginInfo(auth.Principal, provider, provider, displayName)
+            {
+                AuthenticationTokens = auth.Properties.GetTokens(),
+                AuthenticationProperties = auth.Properties
+            };
+        }
+        
+        public static async Task RegisterUserAsync<TUser>(
+            this UserManager<TUser> userManager,
+            TUser user,
+            UserLoginInfo loginInfo,
+            AuthenticationToken accessToken,
+            AuthenticationToken accessTokenSecret) where TUser : class
+        {
+            await userManager.CreateAsync(user);
+            await userManager.UpdateSecurityStampAsync(user);
+            await userManager.AddLoginAsync(user, loginInfo);
+
+            string provider = loginInfo.LoginProvider;
+            
+            await userManager.SetAuthenticationTokenAsync(
+                user,
+                provider,
+                accessToken.Name,
+                accessToken.Value);
+
+            await userManager.SetAuthenticationTokenAsync(
+                user,
+                provider,
+                accessTokenSecret.Name,
+                accessTokenSecret.Value);
+        }
+
+        public static (AuthenticationToken accessToken, AuthenticationToken accessTokenSecret) ExtractTokens(
+            this IEnumerable<AuthenticationToken> tokens)
+        {
+            IEnumerable<AuthenticationToken> tokensList = tokens.ToList();
+            
+            AuthenticationToken accessToken = tokensList
+                .First(token => token.Name == "access_token");
+            
+            AuthenticationToken accessTokenSecret = tokensList
+                .Last(token => token.Name == "access_token_secret");
+            
+            return (accessToken, accessTokenSecret);
         }
     }
 }
