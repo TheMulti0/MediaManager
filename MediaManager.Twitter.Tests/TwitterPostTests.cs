@@ -26,13 +26,17 @@ namespace MediaManager.Twitter.Tests
         [Fact]
         public async void TestFindPostsByUser()
         {
-            throw new NotImplementedException();
+            IUser user = await Twitter.GetUserAsync(Config.DefaultUserId);
+            IAsyncEnumerable<IPost> posts = Twitter.FindPostsAsync(user);
+            Assert.False(await posts.IsEmptyAsync());
         }
 
         [Fact]
         public async void TestFindPostsByQueryAndUser()
         {
-            throw new NotImplementedException();
+            IUser user = await Twitter.GetUserAsync(Config.DefaultUserId);
+            IAsyncEnumerable<IPost> posts = Twitter.FindPostsAsync(user, "C");
+            Assert.False(await posts.IsEmptyAsync());
         }
 
         [Fact]

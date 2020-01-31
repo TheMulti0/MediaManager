@@ -6,6 +6,7 @@ using MediaManager.Api;
 using MediaManager.Extensions;
 using Tweetinvi;
 using Tweetinvi.Models;
+using Tweetinvi.Parameters;
 using IUser = MediaManager.Api.IUser;
 
 namespace MediaManager.Twitter
@@ -75,8 +76,8 @@ namespace MediaManager.Twitter
 
         public IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query)
         {
-            return FindPostsAsync(query)
-                .Where(post => post.Author == author);
+            return FindPostsAsync(author)
+                .Where(post => post.Message.Contains(query));
         }
 
         public async Task<IPost> PostAsync(string description)
