@@ -3,6 +3,11 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <form asp-controller="Twitter" asp-action="Login" method="get" class="form-horizontal">
+            <button>Do stuff here!</button>
+        </form>
+    }
+
 </div>

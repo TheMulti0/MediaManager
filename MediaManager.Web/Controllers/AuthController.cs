@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Twitter;
-using MediaManager.Web.Data;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Facebook;
-using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +34,9 @@ namespace MediaManager.Web.Controllers
         }
 
         [HttpGet("login")]
-        public IActionResult Login(string provider, string returnUrl = DefaultRedirect)
+        public IActionResult Login(
+            string provider,
+            string returnUrl = DefaultRedirect)
         {
             string redirectUrl = Url.Action(
                 nameof(ExternalLoginCallback),
@@ -55,14 +50,15 @@ namespace MediaManager.Web.Controllers
         }
 
         [HttpGet("externalLoginCallback")]
-        public async Task<IActionResult> ExternalLoginCallback(string provider, string returnUrl = DefaultRedirect)
+        public async Task<IActionResult> ExternalLoginCallback(
+            string provider,
+            string returnUrl = DefaultRedirect)
         {  
             ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
+            (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
 
-            (var accessToken, var accessTokenSecret) = info.AuthenticationTokens.ExtractTokens();
-
-            ApplicationUser appUser = await GetTwitterUser(accessToken, accessTokenSecret);
-
+            ApplicationUser appUser = await GetTwitterUser(token, secret);
+            
             bool userExists = await _userManager.Users
                 .AsAsyncEnumerable()
                 .AnyAsync(user => appUser.TwitterId == user.TwitterId);
@@ -72,8 +68,8 @@ namespace MediaManager.Web.Controllers
                 await _userManager.RegisterUserAsync(
                     appUser,
                     info,
-                    accessToken,
-                    accessTokenSecret);
+                    token,
+                    secret);
             }
             
             await _signInManager.SignInAsync(
@@ -90,17 +86,22 @@ namespace MediaManager.Web.Controllers
             AuthenticationToken accessToken,
             AuthenticationToken accessTokenSecret)
         {
-            ISocialMediaProvider twitter = new TwitterProvider(
-                _twitterConfiguration.ConsumerKey,
-                _twitterConfiguration.ConsumerSecret,
-                accessToken.Value,
-                accessTokenSecret.Value);
+            ISocialMediaProvider twitter = GetTwitterProvider(accessToken, accessTokenSecret);
 
             IUser user = await twitter.GetIdentityAsync();
             return new ApplicationUser(user);
         }
 
-        
+        private ISocialMediaProvider GetTwitterProvider(AuthenticationToken accessToken, AuthenticationToken accessTokenSecret)
+        {
+            ISocialMediaProvider twitter = new TwitterProvider(
+                _twitterConfiguration.ConsumerKey,
+                _twitterConfiguration.ConsumerSecret,
+                accessToken.Value,
+                accessTokenSecret.Value);
+            return twitter;
+        }
+
 
         [HttpGet("logout")]
         public async Task<IActionResult> Logout(string provider)

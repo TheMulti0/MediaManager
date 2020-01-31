@@ -1,8 +1,7 @@
-using System;
 using MediaManager.Api;
 using Microsoft.AspNetCore.Identity;
 
-namespace MediaManager.Web.Data
+namespace MediaManager.Web.Models
 {
     public sealed class ApplicationUser : IdentityUser<long>
     {
@@ -20,11 +19,8 @@ namespace MediaManager.Web.Data
         {
             TwitterId = user.Id;
             UserName = user.Name;
-            NormalizedUserName = user.DisplayName;
             DisplayName = user.DisplayName;
             Url = user.Url;
-
-            //SecurityStamp = Guid.NewGuid().ToString();
         }
 
         public bool Equals(IUser other) => TwitterId == other?.Id;

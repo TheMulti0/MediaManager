@@ -5,7 +5,7 @@ namespace MediaManager.Twitter.Tests
 {
     public class TwitterTestBase
     {
-        protected readonly Twitter Twitter;
+        protected readonly TwitterProvider Twitter;
         protected readonly Configuration Config;
 
         protected TwitterTestBase()
@@ -15,7 +15,7 @@ namespace MediaManager.Twitter.Tests
             
             var twitterConfig = Config.Twitter;
             
-            Twitter = new Twitter(
+            Twitter = new TwitterProvider(
                 twitterConfig?.ConsumerKey,
                 twitterConfig?.ConsumerSecret,
                 twitterConfig?.UserAccessToken,

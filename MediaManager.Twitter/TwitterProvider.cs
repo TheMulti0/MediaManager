@@ -6,16 +6,15 @@ using MediaManager.Api;
 using MediaManager.Extensions;
 using Tweetinvi;
 using Tweetinvi.Models;
-using Tweetinvi.Parameters;
 using IUser = MediaManager.Api.IUser;
 
 namespace MediaManager.Twitter
 {
-    public class Twitter : ISocialMediaProvider
+    public class TwitterProvider : ISocialMediaProvider
     {
         private readonly TwitterExecuter _executer;
 
-        public Twitter(
+        public TwitterProvider(
             string consumerKey,
             string consumerSecret,
             string userAccessToken,
