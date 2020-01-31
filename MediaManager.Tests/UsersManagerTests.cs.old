@@ -48,10 +48,10 @@ namespace MediaManager.Tests
             return false;
         }
 
-        private async Task<UsersManager> StartUsersManager(ISocialMediaProvider provider)
+        private async Task<UserPostsChecker> StartUsersManager(ISocialMediaProvider provider)
         {
             IUser user = await provider.GetIdentityAsync();
-            return new UsersManager(new List<IUser>
+            return new UserPostsChecker(new List<IUser>
             {
                 new MockUser
                 {
