@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MediaManager.Api;
+using OperationCanceledException = System.OperationCanceledException;
 
 namespace MediaManager
 {
@@ -10,27 +13,29 @@ namespace MediaManager
         private readonly IPostOperationValidator _validator;
         private readonly IProvidersOperator _operator;
 
-        public IEnumerable<IUser> WatchedUsers { get; }
+        public List<IUser> WatchedUsers { get; }
 
         public UserPostsChecker(
-            IEnumerable<IUser> watchedUsers,
             IPostOperationValidator validator,
             IProvidersOperator @operator)
         {
             _validator = validator;
             _operator = @operator;
 
-            WatchedUsers = watchedUsers;
+            WatchedUsers = new List<IUser>();
         }
 
-        public void CheckAllUsers()
+        public Task CheckAllUsersAsync()
         {
-            WatchedUsers.AsParallel().ForAll(CheckUser);
+            IEnumerable<Task> tasks = WatchedUsers.Select(CheckUser);
+            return Task.WhenAll(tasks);
         }
 
-        private void CheckUser(IUser user)
+        private Task CheckUser(IUser user)
         {
-            _operator.OperateOnAll(provider => CheckNewPosts(user, provider));
+            return _operator
+                .OperateOnAllAsync(
+                    provider => CheckNewPosts(user, provider));
         }
 
         private async Task CheckNewPosts(
@@ -38,18 +43,23 @@ namespace MediaManager
             ISocialMediaProvider provider)
         {
             IUser currentUser = await provider.GetIdentityAsync();
-            
+
             await foreach (IPost post in provider.FindPostsAsync(watchedUser))
             {
-                bool hasUserOperatedOnPost = _validator.HasUserOperatedOnPost(post.Id, currentUser.Id);
-                if (hasUserOperatedOnPost)
-                {
-                    continue;
-                }
-                
-                await provider.LikeAsync(post);
-                _validator.UserOperatedOnPost(post.Id, currentUser.Id);
+                await OperateOnPost(provider, post, currentUser);
             }
+        }
+
+        private async Task OperateOnPost(ISocialMediaProvider provider, IPost post, IUser currentUser)
+        {
+            bool hasUserOperatedOnPost = _validator.HasUserOperatedOnPost(post.Id, currentUser.Id);
+            if (hasUserOperatedOnPost)
+            {
+                return;
+            }
+
+            await provider.LikeAsync(post);
+            _validator.UserOperatedOnPost(post.Id, currentUser.Id);
         }
     }
 }

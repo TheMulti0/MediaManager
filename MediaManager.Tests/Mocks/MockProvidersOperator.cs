@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using MediaManager.Api;
 
@@ -21,9 +22,14 @@ namespace MediaManager.Tests
             Providers = new ConcurrentBag<ISocialMediaProvider>();
         }
 
-        public void OperateOnAll(Func<ISocialMediaProvider, Task> operation)
+        public async Task OperateOnAllAsync(
+            Func<ISocialMediaProvider, Task> operation)
         {
             _onOperate.OnNext(operation);
+            foreach (ISocialMediaProvider provider in Providers)
+            {
+                await operation(provider);
+            }
         }
     }
 }

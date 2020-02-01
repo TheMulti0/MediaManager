@@ -1,23 +1,28 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediaManager.Api;
 
 namespace MediaManager
 {
-    public class ProvidersOperator
+    public class ProvidersOperator : IProvidersOperator
     {
         public ConcurrentBag<ISocialMediaProvider> Providers { get; }
 
-        public ProvidersOperator(ConcurrentBag<ISocialMediaProvider> providers)
+        public ProvidersOperator()
         {
-            Providers = providers;
+            Providers = new ConcurrentBag<ISocialMediaProvider>();
         }
 
-        public void OperateOnAll(Func<ISocialMediaProvider, Task> operation)
+        public Task OperateOnAllAsync(Func<ISocialMediaProvider, Task> operation)
         {
-            Providers.AsParallel().ForAll(async provider => await operation(provider));
+            ParallelQuery<Task> operations =  Providers
+                .AsParallel()
+                .Select(operation);
+
+            return Task.WhenAll(operations);
         }
     }
 }

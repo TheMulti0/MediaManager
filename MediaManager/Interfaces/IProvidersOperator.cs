@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using MediaManager.Api;
 
@@ -9,6 +10,6 @@ namespace MediaManager
     {
         ConcurrentBag<ISocialMediaProvider> Providers { get; }
 
-        void OperateOnAll(Func<ISocialMediaProvider, Task> operation);
+        Task OperateOnAllAsync(Func<ISocialMediaProvider, Task> operation);
     }
 }

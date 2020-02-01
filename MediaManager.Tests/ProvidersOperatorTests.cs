@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using Xunit;
@@ -32,18 +33,23 @@ namespace MediaManager.Tests
         }
 
         [Fact]
-        public void TestConcurrencyAppending()
+        public async Task TestConcurrencyAppending()
         {
             var providers = new ConcurrentBag<ISocialMediaProvider>();
             Append(providers);
             
-            var @operator = new ProvidersOperator(providers);
+            var @operator = new ProvidersOperator();
+            Append(providers);
+
+            foreach (ISocialMediaProvider provider in providers)
+            {
+                @operator.Providers.Add(provider);
+            }
+            
+            await Task.Run(() => @operator.OperateOnAllAsync(Operation));
             Append(providers);
             
-            @operator.OperateOnAll(Operation);
-            Append(providers);
-            
-            Task.Delay(_delay * 2 * 2);
+            await Task.Delay(_delay * 2 * 2);
             Assert.Equal(2 - 1, OperationCounter);
         }
 

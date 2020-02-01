@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using Xunit;
@@ -12,27 +14,45 @@ namespace MediaManager.Tests
         private readonly Counter<int> _onOperate = new Counter<int>();
         
         [Fact]
-        public async Task Test()
+        public async Task TestWithoutProviders()
         {
-            var watchedUsers = new [] { new MockUser() };
+            await Test(new List<ISocialMediaProvider>());
+        }
+        
+        [Fact]
+        public async Task TestWithOneProvider()
+        {
+            await Test(new []{ new MockMediaProvider(1) });
+        }
+
+        private async Task Test(IEnumerable<ISocialMediaProvider> providers)
+        {
+            var watchedUsers = new List<MockUser>()
+            {
+                new MockUser()
+            };
 
             var validator = new MockPostOperationValidator();
             validator.OnHasUserOperated.Subscribe(OnHasUserOperated);
             validator.OnUserOperated.Subscribe(OnUserOperated);
-            
+
             var @operator = new MockProvidersOperator();
+            foreach (ISocialMediaProvider provider in providers)
+            {
+                @operator.Providers.Add(provider);
+            }
             @operator.OnOperate.Subscribe(OnOperate);
 
             IUserPostsChecker checker = new UserPostsChecker(
-                watchedUsers,
-                validator, 
+                validator,
                 @operator);
-            
-            checker.CheckAllUsers();
+            checker.WatchedUsers.AddRange(watchedUsers);
+
+            await checker.CheckAllUsersAsync();
 
             await Task.Delay(TimeSpan.FromMilliseconds(15));
 
-            int usersCount = watchedUsers.Length;
+            int usersCount = watchedUsers.Count;
             int callCount = usersCount * @operator.Providers.Count;
 
             Assert.Equal(callCount, _onHasUserOperated.Get());

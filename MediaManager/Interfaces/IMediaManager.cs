@@ -10,6 +10,6 @@ namespace MediaManager
 
         IProvidersOperator Operator { get; }
         
-        void BeginUserPostWatch(TimeSpan interval);
+        void BeginUserPostWatch(TimeSpan maxInterval);
     }
 }

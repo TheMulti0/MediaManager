@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MediaManager.Api;
 
 namespace MediaManager
 {
     public interface IUserPostsChecker
     {
-        IEnumerable<IUser> WatchedUsers { get; }
+        List<IUser> WatchedUsers { get; }
 
-        void CheckAllUsers();
+        Task CheckAllUsersAsync();
     }
 }

@@ -21,7 +21,7 @@ namespace MediaManager.Tests
         public bool HasUserOperatedOnPost(long postId, long userId)
         {
             _onHasUserOperated.OnNext((postId, userId));
-            return true;
+            return false;
         }
 
         public void UserOperatedOnPost(long postId, long userId) 
