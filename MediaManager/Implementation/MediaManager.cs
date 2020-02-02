@@ -26,17 +26,17 @@ namespace MediaManager
         
         public void BeginUserPostWatch(TimeSpan maxInterval)
         {
-            void RepeatWatch()
+            async Task RepeatWatch()
             {
                 var stopwatch = Stopwatch.StartNew();
 
                 var index = 0;
                 while (true)
                 {
-                    DelayUntilStart(index, maxInterval, stopwatch.Elapsed).Wait();
+                    await DelayUntilStart(index, maxInterval, stopwatch.Elapsed);
 
                     index++;
-                    PostsChecker.CheckAllUsersAsync().Wait();
+                    await PostsChecker.CheckAllUsersAsync();
                 }
             }
 
