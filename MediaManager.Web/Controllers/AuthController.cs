@@ -92,19 +92,20 @@ namespace MediaManager.Web.Controllers
             return new ApplicationUser(user);
         }
 
-        private ISocialMediaProvider GetTwitterProvider(AuthenticationToken accessToken, AuthenticationToken accessTokenSecret)
+        private ISocialMediaProvider GetTwitterProvider(
+            AuthenticationToken accessToken,
+            AuthenticationToken accessTokenSecret)
         {
-            ISocialMediaProvider twitter = new TwitterProvider(
+            return new TwitterProvider(
                 _twitterConfiguration.ConsumerKey,
                 _twitterConfiguration.ConsumerSecret,
                 accessToken.Value,
                 accessTokenSecret.Value);
-            return twitter;
         }
 
 
         [HttpGet("logout")]
-        public async Task<IActionResult> Logout(string provider)
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 

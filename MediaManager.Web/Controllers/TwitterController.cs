@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Extensions.Hosting.AsyncInitialization;
 using MediaManager.Api;
 using MediaManager.Twitter;
 using MediaManager.Web.Data;
@@ -14,48 +16,62 @@ using Microsoft.EntityFrameworkCore;
 namespace MediaManager.Web.Controllers
 {
     [Authorize]
-    public class TwitterController : Controller
+    public class TwitterController : Controller, IAsyncInitializer
     {
         private readonly TwitterAppConfiguration _twitterConfiguration;
         private readonly ApplicationDbContext _database;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly UserWatcher _userWatcher;
+        private readonly IMediaManager _mediaManager;
         
         public TwitterController(
             TwitterAppConfiguration twitterConfiguration, 
             ApplicationDbContext database,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IMediaManager mediaManager)
         {
             _twitterConfiguration = twitterConfiguration;
             _database = database;
             _userManager = userManager;
-            _userWatcher = new UserWatcher(new List<IUser>(), TimeSpan.FromSeconds(5));
+            _mediaManager = mediaManager;
         }
+        
+        public Task InitializeAsync() 
+            => _database.Users.ForEachAwaitAsync(Login);
 
-        public async Task Login()
+        public async Task<IActionResult> Login(string returnUrl = "/")
         {
             ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
-            (IUser user, ISocialMediaProvider provider) = await UserToTwitter(applicationUser);
+            await Login(applicationUser);
             
-            _userWatcher.Add(user, provider);
+            _mediaManager.BeginUserPostWatch(TimeSpan.FromSeconds(2));
+
+            return Redirect(returnUrl);
         }
 
-        private async Task<(IUser user, ISocialMediaProvider provider)> UserToTwitter(ApplicationUser applicationUser)
+        private async Task Login(ApplicationUser applicationUser)
+        {
+            ISocialMediaProvider provider = await UserToTwitter(applicationUser);
+            ConcurrentBag<ISocialMediaProvider> providers = _mediaManager.Operator.Providers;
+            if (!providers.Contains(provider))
+            {
+                providers.Add(provider);
+            }
+            IUser identityAsync = await provider.GetIdentityAsync();
+            _mediaManager.PostsChecker.WatchedUsers.Add(identityAsync);
+        }
+
+        private async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)
         {
             IAsyncEnumerable<IdentityUserToken<long>> asyncTokens = _database.UserTokens.ToAsyncEnumerable();
 
             IdentityUserToken<long> token = await FindTokenAsync(asyncTokens, applicationUser, "access_token");
             IdentityUserToken<long> secret = await FindTokenAsync(asyncTokens, applicationUser, "access_token_secret");
 
-            ISocialMediaProvider twitter = new TwitterProvider(
+            return new TwitterProvider(
                 _twitterConfiguration.ConsumerKey,
                 _twitterConfiguration.ConsumerSecret,
                 token.Value,
                 secret.Value);
-
-            IUser user = await twitter.GetIdentityAsync();
-
-            return (user, twitter);
         }
 
         private static ValueTask<IdentityUserToken<long>> FindTokenAsync(
@@ -68,5 +84,6 @@ namespace MediaManager.Web.Controllers
                                          token.UserId == user.Id &&
                                          token.Name == name);
         }
+
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using MediaManager.Web.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -50,6 +50,7 @@ namespace MediaManager.Web
             });
             
             services.AddSingleton<TwitterAppConfiguration>();
+            services.AddAsyncInitializer<TwitterController>();
             
             services.AddAuthentication(IdentityConstants.ApplicationScheme)
                 .AddTwitter(
@@ -60,6 +61,16 @@ namespace MediaManager.Web
                 
                         options.SaveTokens = true;
                     });
+
+            IPostOperationValidator validator = new PostOperationValidator();
+            IProvidersOperator @operator = new ProvidersOperator();
+            var postsChecker = new UserPostsChecker(validator, @operator);
+            IMediaManager mediaManager = new MediaManager(
+                postsChecker,
+                validator,
+                @operator);
+            
+            services.AddSingleton(mediaManager);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
