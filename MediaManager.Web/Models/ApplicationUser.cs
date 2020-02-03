@@ -5,11 +5,13 @@ namespace MediaManager.Web.Models
 {
     public sealed class ApplicationUser : IdentityUser<long>
     {
-        public long TwitterId { get; set; }
+        public IUser User { get; }
+        
+        public long TwitterId { get; }
 
-        public string DisplayName { get; set; }
+        public string DisplayName { get; }
 
-        public string Url { get; set; }
+        public string Url { get; }
 
         public ApplicationUser()
         {
@@ -17,6 +19,8 @@ namespace MediaManager.Web.Models
 
         public ApplicationUser(IUser user)
         {
+            User = user;
+            
             TwitterId = user.Id;
             UserName = user.Name;
             DisplayName = user.DisplayName;

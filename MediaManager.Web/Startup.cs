@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,7 +36,7 @@ namespace MediaManager.Web
         {
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseInMemoryDatabase("ApplicationDb"));
+                options.UseSqlite("Filename=C:/Users/Raphael/Documents/Programming/C#/Console/MediaManager/MediaManager.Web/MediaManager.Web.db"));
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole<long>>()

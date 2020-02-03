@@ -35,8 +35,11 @@ namespace MediaManager.Web.Controllers
             _mediaManager = mediaManager;
         }
         
-        public Task InitializeAsync() 
-            => _database.Users.ForEachAwaitAsync(Login);
+        public async Task InitializeAsync()
+        {
+            await _database.Database.EnsureCreatedAsync();
+            await _database.Users.ForEachAwaitAsync(Login);
+        }
 
         public async Task<IActionResult> Login(string returnUrl = "/")
         {
@@ -56,8 +59,6 @@ namespace MediaManager.Web.Controllers
             {
                 providers.Add(provider);
             }
-            IUser identityAsync = await provider.GetIdentityAsync();
-            _mediaManager.PostsChecker.WatchedUsers.Add(identityAsync);
         }
 
         private async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)
