@@ -63,15 +63,23 @@ namespace MediaManager.Web
                         options.SaveTokens = true;
                     });
 
+            services.AddSingleton(GetMediaManager());
+        }
+
+        private IMediaManager GetMediaManager()
+        {
             IPostOperationValidator validator = new PostOperationValidator();
             IProvidersOperator @operator = new ProvidersOperator();
             var postsChecker = new UserPostsChecker(validator, @operator);
-            IMediaManager mediaManager = new MediaManager(
+
+            var maxIntervalSeconds = Convert.ToDouble(
+                Configuration["MediaManger:WatchMaximumIntervalSeconds"]);
+            
+            return new MediaManager(
+                TimeSpan.FromSeconds(maxIntervalSeconds),
                 postsChecker,
                 validator,
                 @operator);
-            
-            services.AddSingleton(mediaManager);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

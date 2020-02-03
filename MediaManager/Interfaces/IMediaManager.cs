@@ -1,5 +1,3 @@
-using System;
-
 namespace MediaManager
 {
     public interface IMediaManager
@@ -10,6 +8,6 @@ namespace MediaManager
 
         IProvidersOperator Operator { get; }
         
-        void BeginUserPostWatch(TimeSpan maxInterval);
+        void BeginUserPostWatch();
     }
 }

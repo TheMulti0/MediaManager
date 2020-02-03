@@ -8,6 +8,8 @@ namespace MediaManager
 {
     public class MediaManager : IMediaManager
     {
+        private readonly TimeSpan _watchMaximumInterval;
+        
         public IUserPostsChecker PostsChecker { get; }
         
         public IPostOperationValidator Validator { get; }
@@ -15,16 +17,18 @@ namespace MediaManager
         public IProvidersOperator Operator { get; }
         
         public MediaManager(
+            TimeSpan watchMaximumInterval,
             IUserPostsChecker postsChecker,
             IPostOperationValidator validator,
             IProvidersOperator @operator)
         {
+            _watchMaximumInterval = watchMaximumInterval;
             PostsChecker = postsChecker;
             Validator = validator;
             Operator = @operator;
         }
         
-        public void BeginUserPostWatch(TimeSpan maxInterval)
+        public void BeginUserPostWatch()
         {
             async Task RepeatWatch()
             {
@@ -33,7 +37,7 @@ namespace MediaManager
                 var index = 0;
                 while (true)
                 {
-                    await DelayUntilStart(index, maxInterval, stopwatch.Elapsed);
+                    await DelayUntilStart(index, _watchMaximumInterval, stopwatch.Elapsed);
 
                     index++;
                     await PostsChecker.CheckAllUsersAsync();

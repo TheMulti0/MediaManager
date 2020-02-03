@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +45,6 @@ namespace MediaManager.Web.Controllers
             ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
             await Login(applicationUser);
             
-            _mediaManager.BeginUserPostWatch(TimeSpan.FromSeconds(2));
-
             return Redirect(returnUrl);
         }
 
@@ -59,6 +56,8 @@ namespace MediaManager.Web.Controllers
             {
                 providers.Add(provider);
             }
+            
+            _mediaManager.BeginUserPostWatch();
         }
 
         private async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)

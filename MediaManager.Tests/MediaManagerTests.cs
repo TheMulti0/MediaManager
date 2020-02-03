@@ -23,11 +23,12 @@ namespace MediaManager.Tests
             checker.OnCheck.Subscribe(OnCheck);
             
             var manager = new MediaManager(
+                TimeSpan.FromMilliseconds(10),
                 checker,
                 new MockPostOperationValidator(),
                 new MockProvidersOperator());
 
-            manager.BeginUserPostWatch(_delay);
+            manager.BeginUserPostWatch();
             while (true)
             {
                 if (_counter.Get() == 3 || !_valid.Get())
