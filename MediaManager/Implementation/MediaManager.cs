@@ -8,7 +8,7 @@ namespace MediaManager
 {
     public class MediaManager : IMediaManager
     {
-        private readonly TimeSpan _watchMaximumInterval;
+        private readonly TimeSpan _watchInterval;
         
         public IUserPostsChecker PostsChecker { get; }
         
@@ -17,12 +17,12 @@ namespace MediaManager
         public IProvidersOperator Operator { get; }
         
         public MediaManager(
-            TimeSpan watchMaximumInterval,
+            TimeSpan watchInterval,
             IUserPostsChecker postsChecker,
             IPostOperationValidator validator,
             IProvidersOperator @operator)
         {
-            _watchMaximumInterval = watchMaximumInterval;
+            _watchInterval = watchInterval;
             PostsChecker = postsChecker;
             Validator = validator;
             Operator = @operator;
@@ -38,11 +38,15 @@ namespace MediaManager
                 
                 while (true)
                 {
-                    DateTime beforeSleep = DateTime.Now;
-                    await DelayUntilStart(index, _watchMaximumInterval, beforeSleep - start);
+                    DateTime now = DateTime.Now;
+                    TimeSpan beforeSleep = 
+                        index != 0 
+                            ? now - start 
+                            : TimeSpan.Zero;
+                    await DelayUntilStart(index, _watchInterval, beforeSleep);
 
                     index++;
-                    await PostsChecker.CheckAllUsersAsync(beforeSleep);
+                    await PostsChecker.CheckAllUsersAsync(now);
                 }
             }
 

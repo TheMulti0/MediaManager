@@ -27,8 +27,15 @@ namespace MediaManager
 
         public Task CheckAllUsersAsync(DateTime postsSince)
         {
-            IEnumerable<Task> tasks = WatchedUsers.Select(user => CheckUser(user, postsSince));
-            return Task.WhenAll(tasks);
+            try
+            {
+                IEnumerable<Task> tasks = WatchedUsers.Select(user => CheckUser(user, postsSince));
+                return Task.WhenAll(tasks);
+            }
+            catch (Exception)
+            {
+                return Task.CompletedTask;
+            }
         }
 
         private Task CheckUser(IUser user, DateTime postsSince)

@@ -72,11 +72,11 @@ namespace MediaManager.Web
             IProvidersOperator @operator = new ProvidersOperator();
             var postsChecker = new UserPostsChecker(validator, @operator);
 
-            var maxIntervalSeconds = Convert.ToDouble(
-                Configuration["MediaManger:WatchMaximumIntervalSeconds"]);
+            var intervalSeconds = Convert.ToDouble(
+                Configuration["MediaManager:WatchIntervalSeconds"]);
             
             return new MediaManager(
-                TimeSpan.FromSeconds(maxIntervalSeconds),
+                TimeSpan.FromSeconds(intervalSeconds),
                 postsChecker,
                 validator,
                 @operator);

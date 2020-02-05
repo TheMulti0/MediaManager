@@ -1,7 +1,9 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Twitter;
+using MediaManager.Web.Data;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -14,14 +16,18 @@ namespace MediaManager.Web.Controllers
     public class AuthController : Controller
     {
         private const string DefaultRedirect = "/";
+        
+        private readonly ApplicationDbContext _database;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TwitterAppConfiguration _twitterConfiguration;
 
         public AuthController(
+            ApplicationDbContext database,
             SignInManager<ApplicationUser> signInManager,
             TwitterAppConfiguration twitterConfiguration)
         {
+            _database = database;
             _signInManager = signInManager;
             _userManager = signInManager.UserManager;
             _twitterConfiguration = twitterConfiguration;
@@ -61,7 +67,7 @@ namespace MediaManager.Web.Controllers
             
             bool userExists = await _userManager.Users
                 .AsAsyncEnumerable()
-                .AnyAsync(user => appUser.TwitterId == user.TwitterId);
+                .AnyAsync(user => appUser.Id == user.Id);
             
             if (!userExists)
             {

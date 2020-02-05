@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Extensions.Hosting.AsyncInitialization;
 using MediaManager.Api;
+using MediaManager.Extensions;
 using MediaManager.Twitter;
 using MediaManager.Web.Data;
 using MediaManager.Web.Models;
@@ -37,27 +39,57 @@ namespace MediaManager.Web.Controllers
         public async Task InitializeAsync()
         {
             await _database.Database.EnsureCreatedAsync();
-            await _database.Users.ForEachAwaitAsync(Login);
+            
+            await _database.Users
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(Login);
+            
+            _mediaManager.Validator
+                .OnUserOperatedOnPost
+                .SubscribeAsync(OnUserOperatedOnPost);
+            
+            _mediaManager.BeginUserPostWatch();
+        }
+
+        private async Task OnUserOperatedOnPost((long postId, long userId) ids)
+        {
+            (long postId, long userId) = ids;
+            await _database.OperatedPosts.AddAsync(new OperatedPost()
+            {
+                PostId = postId,
+                UserId = userId
+            });
         }
 
         public async Task<IActionResult> Login(string returnUrl = "/")
         {
-            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
-            await Login(applicationUser);
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+            await Login(user);
             
             return Redirect(returnUrl);
         }
 
-        private async Task Login(ApplicationUser applicationUser)
+        private async Task Login(ApplicationUser user)
         {
-            ISocialMediaProvider provider = await UserToTwitter(applicationUser);
+            try
+            {
+                ISocialMediaProvider provider = await UserToTwitter(user);
+                AddProvider(provider);
+                _mediaManager.PostsChecker.WatchedUsers.Add(await provider.GetIdentityAsync());
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
+        private void AddProvider(ISocialMediaProvider provider)
+        {
             ConcurrentBag<ISocialMediaProvider> providers = _mediaManager.Operator.Providers;
             if (!providers.Contains(provider))
             {
                 providers.Add(provider);
             }
-            
-            _mediaManager.BeginUserPostWatch();
         }
 
         private async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)
