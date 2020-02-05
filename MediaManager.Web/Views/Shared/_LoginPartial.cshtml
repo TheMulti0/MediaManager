@@ -6,13 +6,13 @@
     <li class="nav-item">
         <a class="nav-link text-dark">Hello @User.Identity.Name!</a>
         
-        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
+        @* <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a> *@
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Index">Login</a>
+        <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login" asp-route-provider="Twitter">Login</a>
     </li>
 }
 </ul>
