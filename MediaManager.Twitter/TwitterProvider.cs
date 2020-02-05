@@ -50,34 +50,87 @@ namespace MediaManager.Twitter
                 .Execute(() => TweetAsync.GetTweet(postId)));
         }
 
-        public IAsyncEnumerable<IPost> FindPostsAsync(string query)
+        public IAsyncEnumerable<IPost> FindPostsAsync(PostsSearchQuery query)
         {
-            Task<IEnumerable<ITweet>> searchTweets = _executer
-                .Execute(() => SearchAsync.SearchTweets(query));
+            Task<IEnumerable<ITweet>> tweets = GetTweets(query, out bool authorQuery);
+            IAsyncEnumerable<IPost> posts = ToPostsAsync(tweets);
             
-            return ToPostsAsync(searchTweets);
+            if (authorQuery)
+            {
+                posts = HandleAuthorQuery(query, posts);
+            }
+
+            return posts;
         }
 
-        public async IAsyncEnumerable<IPost> FindPostsAsync(IUser author)
+        private static IAsyncEnumerable<IPost> HandleAuthorQuery(
+            PostsSearchQuery query,
+            IAsyncEnumerable<IPost> posts)
+        {
+            string? queryString = query.Query;
+            if (queryString != null)
+            {
+                posts = posts.Where(post => post.Message.Contains(queryString));
+            }
+
+            DateTime? since = query.Since;
+            if (since != null)
+            {
+                posts = posts.Where(post => post.CreatedAt >= since);
+            }
+
+            return posts;
+        }
+
+        private Task<IEnumerable<ITweet>> GetTweets(PostsSearchQuery query, out bool authorQuery)
+        {
+            authorQuery = query.Author != null;
+            
+            if (authorQuery)
+            {
+                return GetPostsByUserTimeline(
+                    query.Author,
+                    query.MaximumResults);
+            }
+            
+            return GetPostsByQuery(
+                query.Query,
+                query.MaximumResults,
+                query.Since);
+        }
+
+        private Task<IEnumerable<ITweet>> GetPostsByQuery(
+            string query,
+            int maximumResults,
+            DateTime? since)
+        {
+            Task<IEnumerable<ITweet>> Search()
+            {
+                var parameters = new SearchTweetsParameters(query)
+                {
+                    MaximumNumberOfResults = maximumResults
+                };
+
+                if (since != null)
+                {
+                    parameters.Since = (DateTime) since;
+                }
+
+                return SearchAsync.SearchTweets(parameters);
+            }
+
+            return _executer.Execute(Search);
+        }
+
+        private async Task<IEnumerable<ITweet>> GetPostsByUserTimeline(
+            IUser author,
+            int maximumResults)
         {
             Tweetinvi.Models.IUser user = await _executer
                 .Execute(() => UserAsync.GetUserFromId(author.Id));
 
-            var userTimelineTask = _executer
-                .Execute(() => user.GetUserTimelineAsync());
-            
-            IAsyncEnumerable<IPost> posts = ToPostsAsync(userTimelineTask);
-
-            await foreach (IPost post in posts)
-            {
-                yield return post;
-            }
-        }
-
-        public IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query)
-        {
-            return FindPostsAsync(author)
-                .Where(post => post.Message.Contains(query));
+            return await _executer
+                .Execute(() => user.GetUserTimelineAsync(maximumResults));
         }
 
         public async Task<IPost> PostAsync(string description)

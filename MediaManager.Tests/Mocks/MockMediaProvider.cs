@@ -42,25 +42,11 @@ namespace MediaManager.Tests
         public Task<IPost> FindPostAsync(long postId) 
             => Task.FromResult<IPost>(new MockPost { Id = postId });
 
-        public IAsyncEnumerable<IPost> FindPostsAsync(string query)
+        public IAsyncEnumerable<IPost> FindPostsAsync(PostsSearchQuery query)
         {
             return AsyncEnumerable
                 .Range(0, _postBatchCount)
                 .Select(_ => new MockPost { Id = _postIndex++ } );
-        }
-
-        public IAsyncEnumerable<IPost> FindPostsAsync(IUser author)
-        {
-            return AsyncEnumerable
-                .Range(0, _postBatchCount)
-                .Select(_ => new MockPost { Id = _postIndex++, Author = author});
-        }
-
-        public IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query)
-        {
-            return AsyncEnumerable
-                .Range(0, _postBatchCount)
-                .Select(_ => new MockPost { Id = _postIndex++, Author = author });
         }
 
         public Task<IPost> PostAsync(string description)

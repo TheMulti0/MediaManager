@@ -25,26 +25,31 @@ namespace MediaManager
             WatchedUsers = new List<IUser>();
         }
 
-        public Task CheckAllUsersAsync()
+        public Task CheckAllUsersAsync(DateTime postsSince)
         {
-            IEnumerable<Task> tasks = WatchedUsers.Select(CheckUser);
+            IEnumerable<Task> tasks = WatchedUsers.Select(user => CheckUser(user, postsSince));
             return Task.WhenAll(tasks);
         }
 
-        private Task CheckUser(IUser user)
+        private Task CheckUser(IUser user, DateTime postsSince)
         {
             return _operator
                 .OperateOnAllAsync(
-                    provider => CheckNewPosts(user, provider));
+                    provider => CheckNewPosts(user, provider, postsSince));
         }
 
         private async Task CheckNewPosts(
             IUser watchedUser,
-            ISocialMediaProvider provider)
+            ISocialMediaProvider provider,
+            DateTime postsSince)
         {
             IUser currentUser = await provider.GetIdentityAsync();
 
-            await foreach (IPost post in provider.FindPostsAsync(watchedUser))
+            var query = new PostsSearchQuery(watchedUser)
+            {
+                Since = postsSince
+            };
+            await foreach (IPost post in provider.FindPostsAsync(query))
             {
                 await OperateOnPost(provider, post, currentUser);
             }

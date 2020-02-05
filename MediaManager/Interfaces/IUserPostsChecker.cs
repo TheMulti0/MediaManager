@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediaManager.Api;
@@ -8,6 +9,6 @@ namespace MediaManager
     {
         List<IUser> WatchedUsers { get; }
 
-        Task CheckAllUsersAsync();
+        Task CheckAllUsersAsync(DateTime postsSince);
     }
 }

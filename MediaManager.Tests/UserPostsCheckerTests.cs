@@ -34,7 +34,7 @@ namespace MediaManager.Tests
 
             var validator = new MockPostOperationValidator();
             validator.OnHasUserOperated.Subscribe(OnHasUserOperated);
-            validator.OnUserOperated.Subscribe(OnUserOperated);
+            validator.OnUserOperatedOnPost.Subscribe(OnUserOperated);
 
             var @operator = new MockProvidersOperator();
             foreach (ISocialMediaProvider provider in providers)
@@ -48,7 +48,7 @@ namespace MediaManager.Tests
                 @operator);
             checker.WatchedUsers.AddRange(watchedUsers);
 
-            await checker.CheckAllUsersAsync();
+            await checker.CheckAllUsersAsync(DateTime.Now);
 
             await Task.Delay(TimeSpan.FromMilliseconds(15));
 

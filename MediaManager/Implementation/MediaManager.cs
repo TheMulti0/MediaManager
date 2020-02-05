@@ -32,15 +32,17 @@ namespace MediaManager
         {
             async Task RepeatWatch()
             {
-                var stopwatch = Stopwatch.StartNew();
+                DateTime start = DateTime.Now;
 
                 var index = 0;
+                
                 while (true)
                 {
-                    await DelayUntilStart(index, _watchMaximumInterval, stopwatch.Elapsed);
+                    DateTime beforeSleep = DateTime.Now;
+                    await DelayUntilStart(index, _watchMaximumInterval, beforeSleep - start);
 
                     index++;
-                    await PostsChecker.CheckAllUsersAsync();
+                    await PostsChecker.CheckAllUsersAsync(beforeSleep);
                 }
             }
 

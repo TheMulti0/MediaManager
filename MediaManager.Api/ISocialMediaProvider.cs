@@ -13,12 +13,8 @@ namespace MediaManager.Api
 
         Task<IPost> FindPostAsync(long postId);
 
-        IAsyncEnumerable<IPost> FindPostsAsync(string query);
-
-        IAsyncEnumerable<IPost> FindPostsAsync(IUser author);
+        IAsyncEnumerable<IPost> FindPostsAsync(PostsSearchQuery query);
         
-        IAsyncEnumerable<IPost> FindPostsAsync(IUser author, string query);
-
         Task<IPost> PostAsync(string description);
 
         Task DeleteAsync(IPost post);
