@@ -18,11 +18,18 @@ namespace MediaManager
 
         public Task OperateOnAllAsync(Func<ISocialMediaProvider, Task> operation)
         {
-            ParallelQuery<Task> operations =  Providers
-                .AsParallel()
-                .Select(operation);
+            try
+            {
+                ParallelQuery<Task> operations =  Providers
+                    .AsParallel()
+                    .Select(operation);
 
-            return Task.WhenAll(operations);
+                return Task.WhenAll(operations);
+            }
+            catch (Exception)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }
