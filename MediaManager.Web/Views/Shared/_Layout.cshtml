@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole<long>> RoleManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,9 +26,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @{
+                            if (User != null)
+                            {
+                                var user = await UserManager.GetUserAsync(User);
+                                if (user != null)
+                                {
+                                    var userRoles = await UserManager.GetRolesAsync(user);
+                                    if (userRoles.Contains("Admin"))
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark"
+                                               asp-area=""
+                                               asp-controller="WatchedUsers"
+                                               asp-action="Index">
+                                                Watched Users
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            }
+                        }
+                        
                     </ul>
                 </div>
             </div>
@@ -38,7 +61,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2020 - MediaManager.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2020 - MediaManager.Web
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
