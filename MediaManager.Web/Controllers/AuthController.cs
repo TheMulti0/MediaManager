@@ -1,14 +1,13 @@
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Twitter;
-using MediaManager.Web.Data;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace MediaManager.Web.Controllers
 {
@@ -16,21 +15,24 @@ namespace MediaManager.Web.Controllers
     public class AuthController : Controller
     {
         private const string DefaultRedirect = "/";
-        
-        private readonly ApplicationDbContext _database;
+
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole<long>> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TwitterAppConfiguration _twitterConfiguration;
+        private readonly string[] _adminUsers;
 
         public AuthController(
-            ApplicationDbContext database,
             SignInManager<ApplicationUser> signInManager,
-            TwitterAppConfiguration twitterConfiguration)
+            RoleManager<IdentityRole<long>> roleManager,
+            TwitterAppConfiguration twitterConfiguration,
+            RolesConfiguration roles)
         {
-            _database = database;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _userManager = signInManager.UserManager;
             _twitterConfiguration = twitterConfiguration;
+            _adminUsers = roles.AdminUsers;
         }
 
         [HttpGet("unauthorized")]
@@ -63,29 +65,45 @@ namespace MediaManager.Web.Controllers
             ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
             (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
 
-            ApplicationUser appUser = await GetTwitterUser(token, secret);
+            ApplicationUser user = await GetTwitterUser(token, secret);
             
             bool userExists = await _userManager.Users
                 .AsAsyncEnumerable()
-                .AnyAsync(user => appUser.Id == user.Id);
+                .AnyAsync(u => u.Id == user.Id);
             
             if (!userExists)
             {
                 await _userManager.RegisterUserAsync(
-                    appUser,
+                    user,
                     info,
                     token,
                     secret);
+
+                if (_adminUsers?.Contains(user.UserName) ?? false)
+                {
+                    const string role = "Admin";
+
+                    await CreateRole(role);
+                    await _userManager.AddToRoleAsync(user, role);
+                }
             }
             
             await _signInManager.SignInAsync(
-                appUser,
+                user,
                 new AuthenticationProperties
                 {
                     RedirectUri = returnUrl
                 });
             
             return Redirect(returnUrl);
+        }
+
+        private async Task CreateRole(string name)
+        {
+            if (!await _roleManager.RoleExistsAsync(name))
+            {
+                await _roleManager.CreateAsync(new IdentityRole<long>(name));
+            }
         }
 
         private async Task<ApplicationUser> GetTwitterUser(
