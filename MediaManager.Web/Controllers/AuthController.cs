@@ -67,36 +67,50 @@ namespace MediaManager.Web.Controllers
 
             ApplicationUser user = await GetTwitterUser(token, secret);
             
-            bool userExists = await _userManager.Users
-                .AsAsyncEnumerable()
-                .AnyAsync(u => u.Id == user.Id);
+            ApplicationUser existingUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
             
-            if (!userExists)
+            if (existingUser == null)
             {
-                await _userManager.RegisterUserAsync(
-                    user,
-                    info,
-                    token,
-                    secret);
+                await RegisterUser(user, info, token, secret);
 
-                if (_adminUsers?.Contains(user.UserName) ?? false)
-                {
-                    const string role = "Admin";
-
-                    await CreateRole(role);
-                    await _userManager.AddToRoleAsync(user, role);
-                }
+                await SignIn(user, returnUrl);
             }
-            
-            await _signInManager.SignInAsync(
-                user,
-                new AuthenticationProperties
-                {
-                    RedirectUri = returnUrl
-                });
-            
+            else
+            {
+                await SignIn(existingUser, returnUrl);
+            }
+
             return Redirect(returnUrl);
         }
+
+        private async Task RegisterUser(
+            ApplicationUser user,
+            ExternalLoginInfo info,
+            AuthenticationToken token,
+            AuthenticationToken secret)
+        {
+            await _userManager.RegisterUserAsync(
+                user,
+                info,
+                token,
+                secret);
+
+            if (_adminUsers?.Contains(user.UserName) ?? false)
+            {
+                const string role = "Admin";
+
+                await CreateRole(role);
+                await _userManager.AddToRoleAsync(user, role);
+            }
+        }
+
+        private async Task SignIn(ApplicationUser user, string returnUrl) => await _signInManager.SignInAsync(
+            user,
+            new AuthenticationProperties
+            {
+                RedirectUri = returnUrl
+            });
 
         private async Task CreateRole(string name)
         {
