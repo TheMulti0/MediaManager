@@ -1,4 +1,3 @@
-using MediaManager.Api;
 using Xunit;
 
 namespace MediaManager.Twitter.Tests

@@ -14,7 +14,7 @@ namespace MediaManager.Web
             string displayName) where TUser : class
         {
             AuthenticateResult auth = await manager.Context.AuthenticateAsync(provider);
-            IDictionary<string, string> items = auth?.Properties?.Items;
+            IDictionary<string, string>? items = auth?.Properties?.Items;
             if (auth?.Principal == null || items == null)
             {
                 return null;

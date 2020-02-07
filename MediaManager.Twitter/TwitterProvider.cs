@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
-using MediaManager.Extensions;
 using Tweetinvi;
 using Tweetinvi.Models;
 using Tweetinvi.Parameters;

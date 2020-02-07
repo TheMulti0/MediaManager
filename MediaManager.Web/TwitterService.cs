@@ -5,15 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Extensions.Hosting.AsyncInitialization;
 using MediaManager.Api;
-using MediaManager.Extensions;
 using MediaManager.Twitter;
 using MediaManager.Web.Data;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
-using Tweetinvi;
 
 namespace MediaManager.Web
 {

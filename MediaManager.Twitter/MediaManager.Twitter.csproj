@@ -12,7 +12,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MediaManager.Api\MediaManager.Api.csproj" />
-      <ProjectReference Include="..\MediaManager.Extensions\MediaManager.Extensions.csproj" />
     </ItemGroup>
 
 </Project>

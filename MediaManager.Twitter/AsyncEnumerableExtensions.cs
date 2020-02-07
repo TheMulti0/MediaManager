@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediaManager.Extensions
+namespace MediaManager.Twitter
 {
     public static class AsyncEnumerableExtensions
     {

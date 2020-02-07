@@ -1,6 +1,4 @@
 using System.Threading.Tasks;
-using Extensions.Hosting.AsyncInitialization;
-using MediaManager.Extensions;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
