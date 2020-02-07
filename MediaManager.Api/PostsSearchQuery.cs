@@ -12,6 +12,8 @@ namespace MediaManager.Api
 
         public DateTime? Since { get; set; } = null;
 
+        // The set of constructors is not clear.
+
         public PostsSearchQuery(string? query)
         {
             Query = query;
