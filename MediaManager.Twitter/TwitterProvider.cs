@@ -15,7 +15,7 @@ namespace MediaManager.Twitter
         private readonly TwitterExecuter _executer;
 
         public TwitterProvider(
-            string consumerKey,
+            string? consumerKey,
             string consumerSecret,
             string userAccessToken,
             string userAccessSecret)
@@ -87,15 +87,23 @@ namespace MediaManager.Twitter
             
             if (authorQuery)
             {
-                return GetPostsByUserTimeline(
-                    query.Author,
-                    query.MaximumResults);
+                if (query.Author != null)
+                {
+                    return GetPostsByUserTimeline(
+                        query.Author,
+                        query.MaximumResults);
+                }
             }
-            
-            return GetPostsByQuery(
-                query.Query,
-                query.MaximumResults,
-                query.Since);
+
+            if (query.Query != null)
+            {
+                return GetPostsByQuery(
+                    query.Query,
+                    query.MaximumResults,
+                    query.Since);
+            }
+
+            return Task.FromResult(Enumerable.Empty<ITweet>());
         }
 
         private Task<IEnumerable<ITweet>> GetPostsByQuery(

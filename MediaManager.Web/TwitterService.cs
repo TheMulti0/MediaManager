@@ -41,15 +41,21 @@ namespace MediaManager.Web
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(Login);
 
-                await db.OperatedPosts
-                    .ToAsyncEnumerable()
-                    .ForEachAsync(
-                        post => _mediaManager.Validator.UserOperatedOnPost(post.PostId, post.UserId));
+                if (db.OperatedPosts != null)
+                {
+                    await db.OperatedPosts
+                        .ToAsyncEnumerable()
+                        .ForEachAsync(
+                            post => _mediaManager.Validator.UserOperatedOnPost(post.PostId, post.UserId));
+                }
 
-                var watchedUsers = await db.WatchedUsers.ToListAsync();
-                _mediaManager.PostsChecker
-                    .WatchedUsers
-                    .AddRange(watchedUsers);
+                if (db.WatchedUsers != null)
+                {
+                    var watchedUsers = await db.WatchedUsers.ToListAsync();
+                    _mediaManager.PostsChecker
+                        .WatchedUsers
+                        .AddRange(watchedUsers);
+                }
             }
             
             _mediaManager.Validator

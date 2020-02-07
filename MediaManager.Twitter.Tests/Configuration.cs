@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MediaManager.Twitter.Tests
 {
     public class Configuration
@@ -13,13 +15,13 @@ namespace MediaManager.Twitter.Tests
         public TwitterConfiguration? Twitter { get; set; }
 
         public long DefaultPostId { get; set; }
+
+        public string? DefaultPostQuery { get; set; }
         
-        public string DefaultPostQuery { get; set; }
-        
-        public string DefaultPostDescription { get; set; }
+        public string? DefaultPostDescription { get; set; }
 
         public long DefaultUserId { get; set; }
 
-        public string DefaultUserName { get; set; }
+        public string? DefaultUserName { get; set; }
     }
 }

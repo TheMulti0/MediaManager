@@ -17,9 +17,13 @@ namespace MediaManager.Twitter
 
                     return AsyncEnumerator
                         .Create(
-                            async () => enumerator.MoveNext(),
+                            async () => await Task.FromResult(enumerator.MoveNext()),
                             () => enumerator.Current,
-                            async () => enumerator.Dispose())
+                            async () =>
+                            {
+                                enumerator.Dispose();
+                                await Task.CompletedTask;
+                            })
                         .WithCancellation(token);
                 });
         }

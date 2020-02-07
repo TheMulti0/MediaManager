@@ -6,7 +6,7 @@ namespace MediaManager.Web.Views.WatchedUsers
     [BindProperties]
     public class IndexModel : PageModel
     {
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         public void OnPost()
         {

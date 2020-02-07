@@ -61,7 +61,11 @@ namespace MediaManager.Web.Controllers
             using IServiceScope scope = _scopeFactory.CreateScope();
             ApplicationDbContext db = scope.GetDatabase();
 
-            await db.WatchedUsers.AddAsync(new WatchedUser(user));
+            if (db.WatchedUsers != null)
+            {
+                await db.WatchedUsers.AddAsync(new WatchedUser(user));
+            }
+
             await db.SaveChangesAsync();
         }
     }
