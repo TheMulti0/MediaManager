@@ -49,10 +49,11 @@ namespace MediaManager.Web
                 options.LoginPath = "/auth/unauthorized";
                 options.LogoutPath = "/auth/logout";
             });
-            
+
+            services.AddSingleton<RolesConfiguration>();
             services.AddSingleton<TwitterAppConfiguration>();
-            services.AddAsyncInitializer<TwitterController>();
-            
+            services.AddSingleton<TwitterService>();
+                
             services.AddAuthentication(IdentityConstants.ApplicationScheme)
                 .AddTwitter(
                     options =>

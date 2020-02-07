@@ -13,6 +13,8 @@ namespace MediaManager.Web.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<long>, long>
     {
         public DbSet<WatchedUser> WatchedUsers { get; set; }
+
+        public DbSet<OperatedPost> OperatedPosts { get; set; }
         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

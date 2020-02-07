@@ -29,4 +29,9 @@
     <ProjectReference Include="..\MediaManager\MediaManager.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Login\Index.cshtml" />
+  </ItemGroup>
+
 </Project>

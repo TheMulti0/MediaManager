@@ -12,7 +12,11 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login" asp-route-provider="Twitter">Login</a>
+        <a class="nav-link text-dark" 
+           asp-area="" 
+           asp-controller="Auth" asp-action="Login" 
+           asp-route-provider="Twitter"
+           asp-route-returnUrl="/twitter/login">Login</a>
     </li>
 }
 </ul>
