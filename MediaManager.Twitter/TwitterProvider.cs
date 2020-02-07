@@ -87,15 +87,12 @@ namespace MediaManager.Twitter
             
             if (authorQuery)
             {
-                if (query.Author != null)
-                {
-                    return GetPostsByUserTimeline(
-                        query.Author,
-                        query.MaximumResults);
-                }
+                return GetPostsByUserTimeline(
+                    query.Author,
+                    query.MaximumResults);
             }
 
-            if (query.Query != null)
+            if (query.Query != null) // Even though query.Author is null then query.Query must not be null
             {
                 return GetPostsByQuery(
                     query.Query,
