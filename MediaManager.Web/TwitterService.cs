@@ -37,13 +37,23 @@ namespace MediaManager.Web
         {
             using (IServiceScope scope = _scopeFactory.CreateScope())
             {
-                ApplicationDbContext db = GetDatabase(scope);
+                ApplicationDbContext db = scope.GetDatabase();
 
                 await db.Database.EnsureCreatedAsync();
                 
                 await db.Users
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(Login);
+
+                await db.OperatedPosts
+                    .ToAsyncEnumerable()
+                    .ForEachAsync(
+                        post => _mediaManager.Validator.UserOperatedOnPost(post.PostId, post.UserId));
+
+                var watchedUsers = await db.WatchedUsers.ToListAsync();
+                _mediaManager.PostsChecker
+                    .WatchedUsers
+                    .AddRange(watchedUsers);
             }
             
             _mediaManager.Validator
@@ -58,7 +68,7 @@ namespace MediaManager.Web
             (long postId, long userId) = ids;
             
             using IServiceScope scope = _scopeFactory.CreateScope();
-            ApplicationDbContext db = GetDatabase(scope);
+            ApplicationDbContext db = scope.GetDatabase();
 
             await db.OperatedPosts
                 .AddAsync(
@@ -93,11 +103,11 @@ namespace MediaManager.Web
             }
         }
 
-        private async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)
+        public async Task<ISocialMediaProvider> UserToTwitter(ApplicationUser applicationUser)
         {
             using IServiceScope scope = _scopeFactory.CreateScope();
 
-            IAsyncEnumerable<IdentityUserToken<long>> asyncTokens = GetDatabase(scope).UserTokens.ToAsyncEnumerable();
+            IAsyncEnumerable<IdentityUserToken<long>> asyncTokens = scope.GetDatabase().UserTokens.ToAsyncEnumerable();
 
             IdentityUserToken<long> token = await FindTokenAsync(asyncTokens, applicationUser, "access_token");
             IdentityUserToken<long> secret = await FindTokenAsync(asyncTokens, applicationUser, "access_token_secret");
@@ -108,8 +118,6 @@ namespace MediaManager.Web
                 token.Value,
                 secret.Value);
         }
-
-        private static ApplicationDbContext GetDatabase(IServiceScope scope) => scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         private static ValueTask<IdentityUserToken<long>> FindTokenAsync(
             IAsyncEnumerable<IdentityUserToken<long>> tokens,

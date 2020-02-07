@@ -8,7 +8,6 @@ namespace MediaManager.Web.Models
 
         public string ConsumerSecret { get; }
         
-
         public TwitterAppConfiguration(IConfiguration configuration)
         {
             ConsumerKey = configuration["Authentication:Twitter:ConsumerKey"];
