@@ -11,7 +11,7 @@ using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MediaManager.Web
+namespace MediaManager.Web.Services
 {
     public class TwitterService : IAsyncInitializer
     {

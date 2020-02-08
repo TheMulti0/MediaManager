@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MediaManager.Web.Data;
 using MediaManager.Web.Models;
+using MediaManager.Web.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,7 +36,6 @@ namespace MediaManager.Web
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromDays(12 * 31);
                 options.LoginPath = "/auth/unauthorized";
                 options.LogoutPath = "/auth/logout";
             });

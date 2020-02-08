@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using MediaManager.Web.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
