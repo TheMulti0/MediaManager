@@ -36,8 +36,8 @@ namespace MediaManager.Web.Controllers
         public IActionResult Index(IndexViewModel vm)
         {
             return View(vm);
-        }        
-
+        }
+        
         [HttpPost]
         public async Task<IActionResult> Index(string userName)
         {
@@ -57,6 +57,22 @@ namespace MediaManager.Web.Controllers
             }
 
             return await AddUser(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Remove(string userName, string returnUrl)
+        {
+            List<IUser> watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
+            
+            IUser user = watchedUsers.FirstOrDefault(u => u.Name == userName);
+            if (user != null)
+            {
+                watchedUsers.Remove(user);
+                
+                await RemoveWatchedUserFromDb(user);
+            }
+
+            return Redirect(returnUrl);
         }
 
         private async Task<IActionResult> AddUser(IUser user)
@@ -102,6 +118,21 @@ namespace MediaManager.Web.Controllers
             if (db.WatchedUsers != null)
             {
                 await db.WatchedUsers.AddAsync(new WatchedUser(user));
+            }
+
+            await db.SaveChangesAsync();
+        }
+        
+        private async Task RemoveWatchedUserFromDb(IUser user)
+        {
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            ApplicationDbContext db = scope.GetDatabase();
+
+            if (db.WatchedUsers != null)
+            {
+                WatchedUser watchedUser = await db.WatchedUsers.FirstOrDefaultAsync(u => u.Name == user.Name);
+                
+                db.WatchedUsers.Remove(watchedUser);
             }
 
             await db.SaveChangesAsync();

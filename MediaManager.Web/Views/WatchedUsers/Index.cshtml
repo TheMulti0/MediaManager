@@ -1,27 +1,36 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using MediaManager.Web.Data
+@using Microsoft.AspNetCore.Identity
 @using MediaManager.Web.Views.WatchedUsers
 
 @model IndexViewModel
 
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole<long>> RoleManager
+@inject ApplicationDbContext Database
 
 @{
+    ViewData["Title"] = "Watched Users";
+    
     var user = await UserManager.GetUserAsync(User);
     var userRoles = await UserManager.GetRolesAsync(user);
 
     if (userRoles.Contains("Admin"))
     {
-
+        <h1> Watched Users </h1>
+        
+        <hr />
+        <br />
+                
+        <h4> Add an new watched user </h4>
         <form method="post"
               asp-controller="WatchedUsers"
               asp-action="Index"
               class="col-sm-7">
-            
+
             @if (Model?.PreviousSucceeded != null)
             {
                 <div class="form-group">
-                    
+
                     @if (Model.PreviousSucceeded.Value)
                     {
                         <div class="valid-feedback d-block">@Model.Message</div>
@@ -30,7 +39,7 @@
                     {
                         <div class="invalid-feedback d-block">@Model.Message</div>
                     }
-                    
+
                 </div>
             }
 
@@ -39,7 +48,7 @@
                 <label asp-for="UserName" class="col-form-label"></label>
 
                 <input type="text" asp-for="UserName" class="form-control">
-                
+
                 <small class="form-text text-muted">
                     Make sure to enter the username and not the display name! (enter the username without the '@@')
                 </small>
@@ -47,12 +56,57 @@
             </div>
 
             <div class="form-group">
-                
+
                 <button type="submit" class="btn btn-primary">Add</button>
-                
+
             </div>
 
         </form>
-
+        
+        <hr />
+        <br />
+        
+        <h4> Current watched users </h4>
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">UserName</th>
+                <th scope="col">Display Name</th>
+                <th scope="col">Id</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            
+            <tbody>
+            @{
+                List<WatchedUser> watchedUsers = await Database.WatchedUsers.ToListAsync();
+                var index = 1;
+                foreach (WatchedUser watchedUser in watchedUsers)
+                {
+                    <tr>
+                        <th scope="row">@index</th>
+                        <td>@@@watchedUser.Name</td>
+                        <td>@watchedUser.DisplayName</td>
+                        <td>@watchedUser.Id</td>
+                        <td>
+                            <form method="post"
+                                  asp-controller="WatchedUsers"
+                                  asp-action="Remove"
+                                  asp-route-userName="@watchedUser.Name"
+                                  asp-route-returnUrl="@Url.Action(nameof(Index), "WatchedUsers")">
+                                
+                                <button type="submit" class="btn btn-primary">Remove</button>
+                                
+                            </form>
+                        </td>
+                    </tr>
+                    
+                    index++;
+                }
+            }
+            </tbody>
+        </table>
+        
     }
 }
