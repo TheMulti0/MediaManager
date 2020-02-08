@@ -12,7 +12,7 @@ namespace MediaManager.Api
 
         public DateTime? Since { get; set; } = null;
 
-        public PostsSearchQuery(string? query)
+        public PostsSearchQuery(string query)
         {
             Query = query;
         }
@@ -22,7 +22,7 @@ namespace MediaManager.Api
             Author = author;
         }
 
-        public PostsSearchQuery(string? query, IUser author)
+        public PostsSearchQuery(string query, IUser author)
         {
             Query = query;
             Author = author;
