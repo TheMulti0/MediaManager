@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
@@ -60,32 +61,40 @@ namespace MediaManager.Web.Controllers
         public async Task<IActionResult> ExternalLoginCallback(
             string provider,
             string returnUrl = DefaultRedirect)
-        {  
-            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
-            (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
-
-            ApplicationUser user = await GetTwitterUser(token, secret);
-            
-            ApplicationUser existingUser = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.Id == user.Id);
-            
-            if (existingUser == null)
+        {
+            try
             {
-                await RegisterUser(user, info, token, secret);
+                ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
+                (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
 
-                await SignIn(user, returnUrl);
+                ApplicationUser user = await GetTwitterUser(token, secret);
+
+                ApplicationUser existingUser = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+                if (existingUser == null)
+                {
+                    await RegisterUser(user, info, token, secret);
+
+                    await SignIn(user, returnUrl);
+                }
+                else
+                {
+                    await SignIn(existingUser, returnUrl);
+                }
+
+                return Redirect(returnUrl);
             }
-            else
+            catch
             {
-                await SignIn(existingUser, returnUrl);
+                return RedirectToAction(nameof(HomeController.Error), "");
             }
 
-            return Redirect(returnUrl);
         }
 
         private async Task RegisterUser(
             ApplicationUser user,
-            ExternalLoginInfo info,
+            UserLoginInfo info,
             AuthenticationToken token,
             AuthenticationToken secret)
         {

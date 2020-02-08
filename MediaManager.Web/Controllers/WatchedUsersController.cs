@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
@@ -39,6 +40,11 @@ namespace MediaManager.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string userName)
         {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return SendFailure("Please enter a username!");
+            }
+            
             IUser user;
             try
             {
@@ -46,18 +52,18 @@ namespace MediaManager.Web.Controllers
             }
             catch (NullReferenceException)
             {
-                return SendFailure(userName);
+                return SendFailure($"Cannot find Twitter username '@{userName}'");
             }
 
-            return await AddUser(user, userName);
+            return await AddUser(user);
         }
 
-        private async Task<IActionResult> AddUser(IUser user, string userName)
+        private async Task<IActionResult> AddUser(IUser user)
         {
-            var watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
+            List<IUser> watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
             if (watchedUsers.Any(u => u.Id == user.Id))
             {
-                return SendFailure(userName);
+                return SendFailure($"User '@{user.Name}' is already being watched!");
             }
 
             watchedUsers.Add(user);
@@ -66,16 +72,16 @@ namespace MediaManager.Web.Controllers
             return Index(new IndexViewModel
             {
                 PreviousSucceeded = true,
-                UserName = userName
+                Message = "Success!"
             });
         }
 
-        private IActionResult SendFailure(string userName)
+        private IActionResult SendFailure(string message)
         {
             return Index(new IndexViewModel()
             {
                 PreviousSucceeded = false,
-                UserName = userName
+                Message = message
             });
         }
 

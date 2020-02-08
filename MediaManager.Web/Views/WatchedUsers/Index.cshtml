@@ -13,32 +13,43 @@
     if (userRoles.Contains("Admin"))
     {
 
-        <form method="post" 
-              asp-controller="WatchedUsers" 
-              asp-action="Index">
+        <form method="post"
+              asp-controller="WatchedUsers"
+              asp-action="Index"
+              class="col-sm-7">
+            
+            @if (Model?.PreviousSucceeded != null)
+            {
+                <div class="form-group">
+                    
+                    @if (Model.PreviousSucceeded.Value)
+                    {
+                        <div class="valid-feedback d-block">@Model.Message</div>
+                    }
+                    else
+                    {
+                        <div class="invalid-feedback d-block">@Model.Message</div>
+                    }
+                    
+                </div>
+            }
 
             <div class="form-group">
-                <label for="userName">Watched UserName</label>
-                <div>
-                    <input type="text" class="form-control" name="userName">
-                </div>
+
+                <label asp-for="UserName" class="col-form-label"></label>
+
+                <input type="text" asp-for="UserName" class="form-control">
+                
+                <small class="form-text text-muted">
+                    Make sure to enter the username and not the display name! (enter the username without the '@@')
+                </small>
+
             </div>
 
             <div class="form-group">
-                <div>
-                    <button type="submit" class="btn btn-default">Add</button>
-                </div>
-                @if (Model?.PreviousSucceeded == null)
-                {
-                }
-                else if (Model.PreviousSucceeded.Value)
-                {
-                    <label>Success</label>
-                }
-                else
-                {
-                    <label>Failed</label>
-                }
+                
+                <button type="submit" class="btn btn-primary">Add</button>
+                
             </div>
 
         </form>
