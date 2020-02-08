@@ -36,6 +36,7 @@ namespace MediaManager.Web
 
             services.ConfigureApplicationCookie(options =>
             {
+                options.ExpireTimeSpan = TimeSpan.FromDays(1);
                 options.LoginPath = "/auth/unauthorized";
                 options.LogoutPath = "/auth/logout";
             });
