@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
@@ -15,6 +16,7 @@ namespace MediaManager.Web.Controllers
     public class AuthController : Controller
     {
         private const string DefaultRedirect = "/";
+        private const string AdminRole = "Admin";
 
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole<long>> _roleManager;
@@ -62,35 +64,27 @@ namespace MediaManager.Web.Controllers
             string provider,
             string returnUrl = DefaultRedirect)
         {
-            try
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
+            (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
+
+            ApplicationUser user = await GetTwitterUser(token, secret);
+
+            ApplicationUser existingUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            if (existingUser == null)
             {
-                ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(provider, provider);
-                (var token, var secret) = info.AuthenticationTokens.ExtractTokens();
+                await RegisterUser(user, info, token, secret);
 
-                ApplicationUser user = await GetTwitterUser(token, secret);
-
-                ApplicationUser existingUser = await _userManager.Users
-                    .FirstOrDefaultAsync(u => u.Id == user.Id);
-
-                if (existingUser == null)
-                {
-                    await RegisterUser(user, info, token, secret);
-
-                    await SignIn(user, returnUrl);
-                }
-                else
-                {
-                    await SignIn(existingUser, returnUrl);
-                }
-
-                return Redirect(returnUrl);
+                await SignIn(user, returnUrl);
             }
-            catch
+            else
             {
-                return RedirectToAction(nameof(HomeController.Error), "");
+                await SignIn(existingUser, returnUrl);
             }
 
-        }
+            return Redirect(returnUrl);
+    }
 
         private async Task RegisterUser(
             ApplicationUser user,
@@ -104,23 +98,48 @@ namespace MediaManager.Web.Controllers
                 token,
                 secret);
 
+        }
+
+        private async Task SignIn(ApplicationUser user, string returnUrl)
+        {
+            await HandleAdmin(user);
+            
+            await _signInManager.SignInAsync(
+                user,
+                new AuthenticationProperties
+                {
+                    RedirectUri = returnUrl
+                });
+        }
+
+        private async Task HandleAdmin(ApplicationUser user)
+        {
+            bool alreadyAdmin = await IsAlreadyAdmin(user);
+
             if (_adminUsers?.Contains(user.UserName) ?? false)
             {
-                const string role = "Admin";
-
-                await CreateRole(role);
-                await _userManager.AddToRoleAsync(user, role);
+                if (!alreadyAdmin)
+                {
+                    await EnsureRoleExists(AdminRole);
+                    await _userManager.AddToRoleAsync(user, AdminRole);
+                }
+            }
+            else
+            {
+                if (alreadyAdmin)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, AdminRole);
+                }
             }
         }
 
-        private async Task SignIn(ApplicationUser user, string returnUrl) => await _signInManager.SignInAsync(
-            user,
-            new AuthenticationProperties
-            {
-                RedirectUri = returnUrl
-            });
+        private async Task<bool> IsAlreadyAdmin(ApplicationUser user)
+        {
+            IList<string> existingRoles = await _userManager.GetRolesAsync(user);
+            return existingRoles.Contains(AdminRole);
+        }
 
-        private async Task CreateRole(string name)
+        private async Task EnsureRoleExists(string name)
         {
             if (!await _roleManager.RoleExistsAsync(name))
             {
