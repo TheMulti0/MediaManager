@@ -1,7 +1,10 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Web.Data;
 using MediaManager.Web.Models;
+using MediaManager.Web.Views.WatchedUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,24 +31,52 @@ namespace MediaManager.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(IndexViewModel vm)
         {
-            return View();
-        }
+            return View(vm);
+        }        
 
         [HttpPost]
-        public async Task<IActionResult> Post(string userName)
+        public async Task<IActionResult> Index(string userName)
         {
-            var user = await GetUser(userName);
-            if (user == null)
+            IUser user;
+            try
             {
-                return Redirect("");
+                user = await GetUser(userName) ?? throw new NullReferenceException();
+            }
+            catch (NullReferenceException)
+            {
+                return SendFailure(userName);
             }
 
-            _mediaManager.PostsChecker.WatchedUsers.Add(user);
+            return await AddUser(user, userName);
+        }
+
+        private async Task<IActionResult> AddUser(IUser user, string userName)
+        {
+            var watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
+            if (watchedUsers.Any(u => u.Id == user.Id))
+            {
+                return SendFailure(userName);
+            }
+
+            watchedUsers.Add(user);
             await AddWatchedUserToDb(user);
 
-            return RedirectToAction(nameof(Index));
+            return Index(new IndexViewModel
+            {
+                PreviousSucceeded = true,
+                UserName = userName
+            });
+        }
+
+        private IActionResult SendFailure(string userName)
+        {
+            return Index(new IndexViewModel()
+            {
+                PreviousSucceeded = false,
+                UserName = userName
+            });
         }
 
         private async Task<IUser> GetUser(string userName)

@@ -3,14 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MediaManager.Web.Views.WatchedUsers
 {
-    [BindProperties]
-    public class IndexModel : PageModel
+    public class IndexViewModel
     {
-        public string? UserName { get; set; }
-
-        public void OnPost()
-        {
-            var userName = Request.Form["UserName"];
-        }
+        public bool? PreviousSucceeded { get; set; }
+        
+        public string UserName { get; set; }
     }
 }
