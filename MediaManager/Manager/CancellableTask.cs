@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MediaManager
 {
-    class CancellableTask
+    internal class CancellableTask
     {
         private readonly Task _task;
         private readonly CancellationTokenSource _cts;

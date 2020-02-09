@@ -4,20 +4,22 @@ using System.Threading.Tasks;
 
 namespace MediaManager
 {
-    public class PeriodicWatchTask
+    internal class PeriodicWatchTask
     {
         private readonly TimeSpan _interval;
+        private readonly IUserPostsChecker _postsChecker;
         private readonly object _lock = new object();
 
         private IntervalDelay? _delay;
         private CancellableTask? _task;
 
-        public IUserPostsChecker PostsChecker { get; }
         
-        public PeriodicWatchTask(TimeSpan interval, IUserPostsChecker postsChecker)
+        public PeriodicWatchTask(
+            TimeSpan interval,
+            IUserPostsChecker postsChecker)
         {
             _interval = interval;
-            PostsChecker = postsChecker;
+            _postsChecker = postsChecker;
         }
 
         public void Start()
@@ -67,7 +69,7 @@ namespace MediaManager
             {
                 token.ThrowIfCancellationRequested();
 
-                await PostsChecker.CheckAllUsersAsync(DateTime.Now);
+                await _postsChecker.CheckAllUsersAsync(DateTime.Now);
                 await _delay.DelayTillNext();
             }
         }

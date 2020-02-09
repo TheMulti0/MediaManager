@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MediaManager
 {
-    public class IntervalDelay
+    internal class IntervalDelay
     {
         private readonly TimeSpan _interval;
         private readonly DateTime _start;
