@@ -7,7 +7,7 @@ using MediaManager.Api;
 
 namespace MediaManager.Tests
 {
-    public class MockUserPostsChecker : IUserPostsChecker
+    public class MockPostsChecker : IPostsChecker
     {
         private readonly TimeSpan _delay;
         private readonly Subject<Unit> _onCheck;
@@ -16,7 +16,7 @@ namespace MediaManager.Tests
         
         public IObservable<Unit> OnCheck => _onCheck;
 
-        public MockUserPostsChecker(TimeSpan delay = default)
+        public MockPostsChecker(TimeSpan delay = default)
         {
             _delay = delay;
             _onCheck = new Subject<Unit>();

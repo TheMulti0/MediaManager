@@ -6,14 +6,14 @@ using MediaManager.Api;
 
 namespace MediaManager
 {
-    public class UserPostsChecker : IUserPostsChecker
+    public class PostsChecker : IPostsChecker
     {
         private readonly IPostOperationValidator _validator;
         private readonly IProvidersOperator _operator;
 
         public List<IUser> WatchedUsers { get; }
 
-        public UserPostsChecker(
+        public PostsChecker(
             IPostOperationValidator validator,
             IProvidersOperator @operator)
         {

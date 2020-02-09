@@ -6,7 +6,7 @@ using Xunit;
 
 namespace MediaManager.Tests
 {
-    public class MediaManagerTests
+    public class PostsWatcherTests
     {
         private readonly TimeSpan _delay = TimeSpan.FromMilliseconds(10);
         private readonly Counter<int> _counter = new Counter<int>();
@@ -19,16 +19,14 @@ namespace MediaManager.Tests
         {
             _counter.Set(1);
             _valid.Set(true);
-            var checker = new MockUserPostsChecker(TimeSpan.FromMilliseconds(20));
+            var checker = new MockPostsChecker(TimeSpan.FromMilliseconds(20));
             checker.OnCheck.Subscribe(OnCheck);
             
-            var manager = new MediaManager(
+            var manager = new PostsWatcher(
                 TimeSpan.FromMilliseconds(10),
-                checker,
-                new MockPostOperationValidator(),
-                new MockProvidersOperator());
+                checker);
 
-            manager.StartUserPostWatch();
+            manager.StartWatch();
             while (true)
             {
                 if (_counter.Get() == 3 || !_valid.Get())

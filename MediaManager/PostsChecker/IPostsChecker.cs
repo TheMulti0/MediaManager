@@ -5,7 +5,7 @@ using MediaManager.Api;
 
 namespace MediaManager
 {
-    public interface IUserPostsChecker
+    public interface IPostsChecker
     {
         List<IUser> WatchedUsers { get; }
 

@@ -55,23 +55,26 @@ namespace MediaManager.Web
                         options.SaveTokens = true;
                     });
 
-            services.AddSingleton(GetMediaManager());
+            AddMediaManagerComponents(services);
         }
 
-        private IMediaManager GetMediaManager()
+        private void AddMediaManagerComponents(IServiceCollection services)
         {
             IPostOperationValidator validator = new PostOperationValidator();
+
             IProvidersOperator @operator = new ProvidersOperator();
-            var postsChecker = new UserPostsChecker(validator, @operator);
+            services.AddSingleton(@operator);
+            
+            IPostsChecker postsChecker = new PostsChecker(validator, @operator);
+            services.AddSingleton(postsChecker);
 
             var intervalSeconds = Convert.ToDouble(
                 Configuration["MediaManager:WatchIntervalSeconds"]);
             
-            return new MediaManager(
+            IPostsWatcher postsWatcher = new PostsWatcher(
                 TimeSpan.FromSeconds(intervalSeconds),
-                postsChecker,
-                validator,
-                @operator);
+                postsChecker);
+            services.AddSingleton(postsWatcher);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

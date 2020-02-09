@@ -18,18 +18,18 @@ namespace MediaManager.Web.Controllers
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TwitterService _twitter;
-        private readonly IMediaManager _mediaManager;
+        private readonly IPostsChecker _postsChecker;
 
         public WatchedUsersController(
             IServiceScopeFactory scopeFactory,
             UserManager<ApplicationUser> userManager,
-            TwitterService twitter, 
-            IMediaManager mediaManager)
+            TwitterService twitter,
+            IPostsChecker postsChecker)
         {
             _scopeFactory = scopeFactory;
             _userManager = userManager;
             _twitter = twitter;
-            _mediaManager = mediaManager;
+            _postsChecker = postsChecker;
         }
 
         [HttpGet]
@@ -62,7 +62,7 @@ namespace MediaManager.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Remove(string userName, string returnUrl)
         {
-            List<IUser> watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
+            List<IUser> watchedUsers = _postsChecker.WatchedUsers;
             
             IUser user = watchedUsers.FirstOrDefault(u => u.Name == userName);
             if (user != null)
@@ -77,7 +77,7 @@ namespace MediaManager.Web.Controllers
 
         private async Task<IActionResult> AddUser(IUser user)
         {
-            List<IUser> watchedUsers = _mediaManager.PostsChecker.WatchedUsers;
+            List<IUser> watchedUsers = _postsChecker.WatchedUsers;
             if (watchedUsers.Any(u => u.Id == user.Id))
             {
                 return SendFailure($"User '@{user.Name}' is already being watched!");
@@ -104,8 +104,8 @@ namespace MediaManager.Web.Controllers
 
         private async Task<IUser> GetUser(string userName)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-            var provider = await _twitter.UserToTwitter(currentUser);
+            ApplicationUser currentUser = await _userManager.GetUserAsync(User);
+            ISocialMediaProvider provider = await _twitter.UserToTwitter(currentUser);
 
             return await provider.GetUserAsync(userName);
         }

@@ -17,16 +17,28 @@ namespace MediaManager.Web.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly TwitterAppConfiguration _configuration;
-        private readonly IMediaManager _mediaManager;
         
+        private readonly IPostsWatcher _postsWatcher;
+        private readonly IPostsChecker _postsChecker;
+        private readonly IProvidersOperator _providersOperator;
+        private readonly IPostOperationValidator _postOperationValidator;
+
         public TwitterService(
             IServiceScopeFactory scopeFactory,
             TwitterAppConfiguration configuration,
-            IMediaManager mediaManager)
+            
+            IPostsWatcher postsWatcher,
+            IPostsChecker postsChecker,
+            IProvidersOperator providersOperator,
+            IPostOperationValidator postOperationValidator)
         {
             _scopeFactory = scopeFactory;
             _configuration = configuration;
-            _mediaManager = mediaManager;
+            
+            _postsWatcher = postsWatcher;
+            _postsChecker = postsChecker;
+            _providersOperator = providersOperator;
+            _postOperationValidator = postOperationValidator;
         }
         
         public async Task InitializeAsync()
@@ -46,23 +58,23 @@ namespace MediaManager.Web.Services
                     await db.OperatedPosts
                         .ToAsyncEnumerable()
                         .ForEachAsync(
-                            post => _mediaManager.Validator.UserOperatedOnPost(post.PostId, post.UserId));
+                            post => _postOperationValidator.UserOperatedOnPost(post.PostId, post.UserId));
                 }
 
                 if (db.WatchedUsers != null)
                 {
                     var watchedUsers = await db.WatchedUsers.ToListAsync();
-                    _mediaManager.PostsChecker
+                    _postsChecker
                         .WatchedUsers
                         .AddRange(watchedUsers);
                 }
             }
             
-            _mediaManager.Validator
+            _postOperationValidator
                 .OnUserOperatedOnPost
                 .SubscribeAsync(OnUserOperatedOnPost);
             
-            _mediaManager.StartUserPostWatch();
+            _postsWatcher.StartWatch();
         }
 
         private async Task OnUserOperatedOnPost((long postId, long userId) ids)
@@ -98,7 +110,7 @@ namespace MediaManager.Web.Services
 
         private void AddProvider(ISocialMediaProvider provider)
         {
-            ConcurrentBag<ISocialMediaProvider> providers = _mediaManager.Operator.Providers;
+            ConcurrentBag<ISocialMediaProvider> providers = _providersOperator.Providers;
             if (!providers.Contains(provider))
             {
                 providers.Add(provider);

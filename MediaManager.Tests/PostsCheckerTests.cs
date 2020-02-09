@@ -6,7 +6,7 @@ using Xunit;
 
 namespace MediaManager.Tests
 {
-    public class UserPostsCheckerTests
+    public class PostsCheckerTests
     {
         private readonly Counter<int> _onHasUserOperated = new Counter<int>();
         private readonly Counter<int> _onUserOperated = new Counter<int>();
@@ -42,7 +42,7 @@ namespace MediaManager.Tests
             }
             @operator.OnOperate.Subscribe(OnOperate);
 
-            IUserPostsChecker checker = new UserPostsChecker(
+            IPostsChecker checker = new PostsChecker(
                 validator,
                 @operator);
             checker.WatchedUsers.AddRange(watchedUsers);
