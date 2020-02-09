@@ -61,6 +61,7 @@ namespace MediaManager.Web
         private void AddMediaManagerComponents(IServiceCollection services)
         {
             IPostOperationValidator validator = new PostOperationValidator();
+            services.AddSingleton(validator);
 
             IProvidersOperator @operator = new ProvidersOperator();
             services.AddSingleton(@operator);
