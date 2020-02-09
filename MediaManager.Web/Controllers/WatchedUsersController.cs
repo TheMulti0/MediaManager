@@ -7,12 +7,14 @@ using MediaManager.Web.Data;
 using MediaManager.Web.Models;
 using MediaManager.Web.Services;
 using MediaManager.Web.Views.WatchedUsers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaManager.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class WatchedUsersController : Controller
     {
         private readonly IServiceScopeFactory _scopeFactory;
