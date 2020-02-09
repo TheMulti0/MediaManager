@@ -18,17 +18,23 @@ namespace MediaManager.Web.Controllers
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TwitterService _twitter;
+        
+        private readonly IPostsWatcher _postsWatcher;
         private readonly IPostsChecker _postsChecker;
 
         public WatchedUsersController(
             IServiceScopeFactory scopeFactory,
             UserManager<ApplicationUser> userManager,
             TwitterService twitter,
+            
+            IPostsWatcher postsWatcher,
             IPostsChecker postsChecker)
         {
             _scopeFactory = scopeFactory;
             _userManager = userManager;
             _twitter = twitter;
+
+            _postsWatcher = postsWatcher;
             _postsChecker = postsChecker;
         }
 
@@ -71,6 +77,14 @@ namespace MediaManager.Web.Controllers
                 
                 await RemoveWatchedUserFromDb(user);
             }
+
+            return Redirect(returnUrl);
+        }
+
+        [HttpGet]
+        public IActionResult CheckManually(string returnUrl)
+        {
+            _postsWatcher.StartWatch();
 
             return Redirect(returnUrl);
         }

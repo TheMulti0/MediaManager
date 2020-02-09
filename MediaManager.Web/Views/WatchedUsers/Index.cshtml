@@ -1,4 +1,6 @@
-﻿@using MediaManager.Web.Data
+﻿@using MediaManager
+@using MediaManager.Web.Controllers
+@using MediaManager.Web.Data
 @using Microsoft.AspNetCore.Identity
 @using MediaManager.Web.Views.WatchedUsers
 
@@ -7,21 +9,43 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole<long>> RoleManager
 @inject ApplicationDbContext Database
+@inject IPostsWatcher PostsWatcher
 
 @{
     ViewData["Title"] = "Watched Users";
     
-    var user = await UserManager.GetUserAsync(User);
-    var userRoles = await UserManager.GetRolesAsync(user);
+    ApplicationUser user = await UserManager.GetUserAsync(User);
+    IList<string> userRoles = await UserManager.GetRolesAsync(user);
+
+    var controller = "WatchedUsers";
+    string indexUrl = Url.Action(nameof(Index), controller);
 
     if (userRoles.Contains("Admin"))
     {
+        <label class="alert-info">
+            Last post check time: @PostsWatcher.LastPostsCheckTime
+            
+            
+            <a href="@Url.Action(nameof(WatchedUsersController.CheckManually), controller, new
+                     {
+                         ReturnUrl = indexUrl
+                     })"
+               type="submit"
+               class="alert-link">
+                
+                Press here to check manually
+                
+            </a>
+
+        </label>
+
         <h1> Watched Users </h1>
         
         <hr />
         <br />
-                
-        <h4> Add an new watched user </h4>
+
+
+        <h4> Add a new watched user </h4>
         <form method="post"
               asp-controller="WatchedUsers"
               asp-action="Index"
@@ -94,7 +118,7 @@
                                   asp-controller="WatchedUsers"
                                   asp-action="Remove"
                                   asp-route-userName="@watchedUser.Name"
-                                  asp-route-returnUrl="@Url.Action(nameof(Index), "WatchedUsers")">
+                                  asp-route-returnUrl="@indexUrl">
                                 
                                 <button type="submit" class="btn btn-primary">Remove</button>
                                 
