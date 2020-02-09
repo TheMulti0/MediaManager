@@ -28,7 +28,7 @@ namespace MediaManager.Tests
                 new MockPostOperationValidator(),
                 new MockProvidersOperator());
 
-            manager.BeginUserPostWatch();
+            manager.StartUserPostWatch();
             while (true)
             {
                 if (_counter.Get() == 3 || !_valid.Get())

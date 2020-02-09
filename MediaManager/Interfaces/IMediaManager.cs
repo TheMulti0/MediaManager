@@ -8,6 +8,7 @@ namespace MediaManager
 
         IProvidersOperator Operator { get; }
         
-        void BeginUserPostWatch();
+        void StartUserPostWatch();
+        void StopUserPostWatch();
     }
 }

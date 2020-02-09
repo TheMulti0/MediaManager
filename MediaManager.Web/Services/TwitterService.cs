@@ -62,7 +62,7 @@ namespace MediaManager.Web.Services
                 .OnUserOperatedOnPost
                 .SubscribeAsync(OnUserOperatedOnPost);
             
-            _mediaManager.BeginUserPostWatch();
+            _mediaManager.StartUserPostWatch();
         }
 
         private async Task OnUserOperatedOnPost((long postId, long userId) ids)
