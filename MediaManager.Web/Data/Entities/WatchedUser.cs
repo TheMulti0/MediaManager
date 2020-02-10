@@ -1,6 +1,6 @@
 using MediaManager.Api;
 
-namespace MediaManager.Web.Models
+namespace MediaManager.Web.Data.Entities
 {
     public class WatchedUser : IUser
     {

@@ -7,6 +7,7 @@ using Extensions.Hosting.AsyncInitialization;
 using MediaManager.Api;
 using MediaManager.Twitter;
 using MediaManager.Web.Data;
+using MediaManager.Web.Data.Entities;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

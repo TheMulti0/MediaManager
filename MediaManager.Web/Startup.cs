@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MediaManager.Web.Data;
+using MediaManager.Web.Data.Entities;
 using MediaManager.Web.Models;
 using MediaManager.Web.Services;
 using Microsoft.Extensions.Configuration;

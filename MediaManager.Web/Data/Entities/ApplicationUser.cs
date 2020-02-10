@@ -1,7 +1,7 @@
 using MediaManager.Api;
 using Microsoft.AspNetCore.Identity;
 
-namespace MediaManager.Web.Models
+namespace MediaManager.Web.Data.Entities
 {
     public sealed class ApplicationUser : IdentityUser<long>
     {

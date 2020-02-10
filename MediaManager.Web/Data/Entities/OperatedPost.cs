@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MediaManager.Web.Models
+namespace MediaManager.Web.Data.Entities
 {
     public class OperatedPost
     {

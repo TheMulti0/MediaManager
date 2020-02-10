@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Twitter;
+using MediaManager.Web.Data.Entities;
 using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;

@@ -1,4 +1,5 @@
-﻿using MediaManager.Web.Models;
+﻿using MediaManager.Web.Data.Entities;
+using MediaManager.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

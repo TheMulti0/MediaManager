@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using MediaManager.Web.Models;
+using MediaManager.Web.Data.Entities;
 using MediaManager.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediaManager.Api;
 using MediaManager.Web.Data;
-using MediaManager.Web.Models;
+using MediaManager.Web.Data.Entities;
 using MediaManager.Web.Services;
 using MediaManager.Web.Views.WatchedUsers;
 using Microsoft.AspNetCore.Authorization;

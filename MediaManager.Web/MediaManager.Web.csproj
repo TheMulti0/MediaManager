@@ -38,4 +38,14 @@
     <UpToDateCheckInput Remove="Views\Login\Index.cshtml" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="Configuration" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Compile Remove="Configuration\MediaManagerConfiguration.cs" />
+  </ItemGroup>
+
 </Project>
