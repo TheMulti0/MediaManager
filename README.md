@@ -25,7 +25,7 @@ The project currently implements full support for Twitter (using OAuth2 user-tok
 The MediaManager implementation currently allows the following operations;
  - Operate a custom operation on all given social media users.
  - Check given social media users for new posts, like the new ones, and validate that the post has not been operated on (and support for doing so periodically).
-
+---
 ### Website demonstration
 
 ![alt text](https://i.imgur.com/2oYCzPF.png)
